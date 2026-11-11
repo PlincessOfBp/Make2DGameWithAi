@@ -13,4 +13,10 @@ class Inventory:
             self.slots[self.slots.index(None)] = item
 
     def remove(self, item, count=1):
-        pass
+        remaining = self.items[item] - count
+        if remaining:
+            self.items[item] = remaining
+        else:
+            del self.items[item]
+            if item in self.slots:
+                self.slots[self.slots.index(item)] = None
