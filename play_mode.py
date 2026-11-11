@@ -38,4 +38,11 @@ class PlayMode:
 
 
     def draw(self):
-        pass
+        cam_x, cam_y = self.camera
+        ground = self.images["world/ground.png"]
+        if ground is not None:
+            ground.clip_draw(cam_x, cam_y, SCREEN_WIDTH, SCREEN_HEIGHT,
+                             SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+        else:
+            p.draw_rectangle(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, 91, 112, 75, filled=True)
+        self.draw_buildings()
