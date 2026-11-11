@@ -50,3 +50,6 @@ class Inventory:
     def unassign(self, item):
         if item in self.slots:
             self.slots[self.slots.index(item)] = None
+
+    def selected_item(self):
+        pass
