@@ -61,3 +61,6 @@ class Player:
             world.resolve_player_action(self, self.action, self.action_angle, self.action_weapon)
         if self.action_elapsed >= 0.36:
             self.action = None
+
+    def use_selected(self, world):
+        pass
