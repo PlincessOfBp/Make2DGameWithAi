@@ -10,4 +10,5 @@ ASSETS = Path(__file__).resolve().parent / "assets"
 
 
 class PlayMode:
-    pass
+    def enter(self):
+        pass
