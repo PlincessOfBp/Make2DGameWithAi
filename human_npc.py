@@ -152,4 +152,24 @@ class HumanNPC:
             actor.walk_time = 0.0
 
     def update(self, world, player, dt):
-        pass
+        actor = self.actor
+        if actor.state == "fleeing":
+            self.flee(world, dt)
+        elif actor.advance_attack(world, player):
+            return
+        elif self.command == "follow":
+            actor.follow_route(world, (player.x, player.y), dt, 55, speed=215)
+        elif self.command == "attack":
+            target = world.actor_by_id(self.target)
+            if target is None or target.state != "zombie":
+                self.set_command(world, "wait")
+            elif (hypot(target.x - actor.x, target.y - actor.y) <= 31
+                  and world.pickup_path_clear(actor.x, actor.y, target.x, target.y)):
+                actor.start_attack(target, world.resource_time)
+            else:
+                actor.follow_route(world, (target.x, target.y), dt, 27, speed=215)
+        elif self.command in ("wood", "stone"):
+            self.gather(world, player, dt)
+        elif world.resource_time >= self.gather_until:
+            self.tool = None
+            self.protect(world, dt)
