@@ -137,15 +137,27 @@ class HumanNPC:
             actor.start_attack(threat, world.resource_time)
             return True
         if low_health:
-            heading = atan2(actor.y - threat.y, actor.x - threat.x)
-            candidates = [
-                world.move(actor.x, actor.y, cos(heading + turn * tau / 8) * 30,
-                           sin(heading + turn * tau / 8) * 30, actor.RADIUS, actor=actor)
-                for turn in range(8)
-            ]
-            x, y = max(candidates, key=lambda point: hypot(point[0] - threat.x, point[1] - threat.y))
-            if hypot(x - threat.x, y - threat.y) > distance + 0.01:
-                actor.move_toward(world, x, y, dt, 215, 0, steer=False)
+            goal = self.follow_retreat_goal if following_retreat else None
+            if goal is not None and (
+                hypot(goal[0] - actor.x, goal[1] - actor.y) <= 1
+                or hypot(goal[0] - threat.x, goal[1] - threat.y) <= distance
+                or not world.pickup_path_clear(
+                    actor.x, actor.y, *goal, actor.RADIUS, world.collision_obstacles(actor)
+                )
+            ):
+                goal = None
+            if goal is None:
+                heading = atan2(actor.y - threat.y, actor.x - threat.x)
+                candidates = [
+                    world.move(actor.x, actor.y, cos(heading + turn * tau / 8) * 30,
+                               sin(heading + turn * tau / 8) * 30, actor.RADIUS, actor=actor)
+                    for turn in range(8)
+                ]
+                goal = max(candidates, key=lambda point: hypot(point[0] - threat.x, point[1] - threat.y))
+            if hypot(goal[0] - threat.x, goal[1] - threat.y) > distance + 0.01:
+                actor.move_toward(world, *goal, dt, 215, 0, steer=False)
+                if following_retreat:
+                    self.follow_retreat_goal = goal if actor.walk_time else None
                 return True
         if distance <= 31:
             actor.start_attack(threat, world.resource_time)
