@@ -336,3 +336,6 @@ class World:
         if pickup_id.startswith("stone:"):
             self.stone_respawns[pickup_id] = (self.resource_time + STONE_RESPAWN_SECONDS, pickup)
         return pickup[0]
+
+    def can_command_ally(self, player, ally):
+        pass
