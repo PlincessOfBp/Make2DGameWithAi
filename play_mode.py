@@ -179,7 +179,11 @@ class PlayMode:
         x, y = round(player.x) - cam_x, round(player.y) - cam_y
         image = self.images["characters/player.png"]
         if image is not None:
-            if player.action is None:
+            if player.health == 0:
+                frame, source_y = 0, 1024
+            elif self.world.resource_time < player.hurt_until:
+                frame, source_y = 0, 1088
+            elif player.action is None:
                 walking = player.walk_time > 0
                 frame = int(player.walk_time * player.WALK_FPS) % 4
                 source_y = 1280 if walking else 1344
@@ -261,7 +265,7 @@ class PlayMode:
 
     def draw_weapon(self):
         player = self.player
-        if player.action == "bite":
+        if player.health == 0 or player.action == "bite":
             return
         inventory = player.inventory
         attacking = player.action == "attack"
