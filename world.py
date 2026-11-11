@@ -2,4 +2,5 @@ from town import BUILDING_LAYOUTS, BUILDINGS, MAP_HEIGHT, MAP_WIDTH, SCREEN_HEIG
 
 
 class World:
-    pass
+    def __init__(self):
+        pass
