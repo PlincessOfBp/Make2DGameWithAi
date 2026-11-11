@@ -53,3 +53,6 @@ class HumanNPC:
             actor.state = "escaped"
         elif not actor.route and not actor.walk_time and world.resource_time >= actor.next_route_at:
             self.destination = None
+
+    def protect(self, world, dt):
+        pass
