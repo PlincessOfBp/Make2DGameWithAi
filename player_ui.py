@@ -68,4 +68,5 @@ class PlayerUI:
         return True
 
     def text(self, x, y, value, color=(248, 239, 218)):
-        pass
+        if self.font is not None:
+            self.font.draw(x, y, value, color)
