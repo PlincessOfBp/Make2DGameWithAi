@@ -46,7 +46,7 @@ class Zombie:
             return
         self.angle = atan2(dy, dx) - pi / 2
         step = min(speed * dt, distance - stop) / distance
-        position = world.move(self.x, self.y, dx * step, dy * step, 8)
+        position = world.move(self.x, self.y, dx * step, dy * step, self.RADIUS, actor=self)
         self.walk_time = self.walk_time + dt if position != (self.x, self.y) else 0.0
         self.x, self.y = position
 
