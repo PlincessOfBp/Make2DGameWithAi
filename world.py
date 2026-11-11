@@ -16,12 +16,17 @@ from town import (
 class World:
     def __init__(self):
         self.buildings = []
-        self.trees = TREE_TRUNKS
-        self.walls = [
-            (x - TREE_TRUNK_HALF_WIDTH, y - TREE_TRUNK_HALF_HEIGHT,
-             x + TREE_TRUNK_HALF_WIDTH, y + TREE_TRUNK_HALF_HEIGHT)
+        self.trees = list(TREE_TRUNKS)
+        self.tree_walls = {
+            (x, y): (x - TREE_TRUNK_HALF_WIDTH, y - TREE_TRUNK_HALF_HEIGHT,
+                     x + TREE_TRUNK_HALF_WIDTH, y + TREE_TRUNK_HALF_HEIGHT)
             for x, y in self.trees
-        ]
+        }
+        self.walls = list(self.tree_walls.values())
+        self.tree_respawns = {}
+        self.barricades = []
+        self.random = Random()
+        self.zombies = [Zombie(index, x, y) for index, (x, y) in enumerate(ZOMBIE_POINTS)]
         self.furniture = {}
         for kind, x, y in BUILDINGS:
             (image_width, image_height), rooms, walls = BUILDING_LAYOUTS[kind]
