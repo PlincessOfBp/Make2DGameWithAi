@@ -78,3 +78,6 @@ class PlayMode:
                 for left, bottom, right, top in footprint:
                     p.draw_rectangle(left - cam_x, bottom - cam_y, right - cam_x, top - cam_y,
                                      100, 80, 68, filled=True)
+
+    def draw_player(self):
+        pass
