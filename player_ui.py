@@ -223,6 +223,9 @@ class PlayerUI:
         else:
             if human.command in ("wood", "stone"):
                 status = f"채집 중  ·  남은 수량 {human.gather_remaining}"
+            elif human.gather_shortfall and human.command in ("return", "wait"):
+                suffix = "복귀 중" if human.command == "return" else "복귀 완료"
+                status = f"채집 {human.gather_shortfall}개 미달  ·  {suffix}"
             else:
                 status = {"return": "명령 지점으로 복귀 중", "follow": "따라가기 · 전투 지원",
                           "attack": "공동 공격 중", "wait": "대기 중"}[human.command]
