@@ -224,3 +224,6 @@ class World:
             self.pickups[f"zombie:{zombie.entity_id}"] = (
                 item, zombie.x, zombie.y, self.building_at(zombie.x, zombie.y),
             )
+
+    def harvest_tree(self, player, position):
+        pass
