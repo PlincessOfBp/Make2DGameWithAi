@@ -16,7 +16,8 @@ from town import (
 
 
 class World:
-    def __init__(self):
+    def __init__(self, player=None):
+        self.player = player
         self.buildings = []
         self.trees = dict.fromkeys(TREE_TRUNKS, TREE_MAX_HP)
         self.tree_walls = {
