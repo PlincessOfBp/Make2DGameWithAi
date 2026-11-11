@@ -132,6 +132,7 @@ class PlayMode:
         self.draw_buildings(interiors=False)
         remaining = sum(z.state == "zombie" for z in self.world.zombies)
         self.ui.draw_hud(self.images, self.player, remaining)
+        self.ui.draw_ally(self.images)
         self.ui.draw_window(self.images, self.player)
 
     def draw_buildings(self, interiors):
