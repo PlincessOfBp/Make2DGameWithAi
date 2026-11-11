@@ -6,4 +6,5 @@ from town import SCREEN_HEIGHT, SCREEN_WIDTH
 
 
 class GameFramework:
-    pass
+    def run(self, mode):
+        pass
