@@ -77,3 +77,6 @@ class PlayerUI:
             p.draw_rectangle(x, top - height, x + width, top, 44, 49, 52, filled=True)
         else:
             image.draw(x + width // 2, top - height // 2)
+
+    def icon(self, images, item, x, y, count=None):
+        pass
