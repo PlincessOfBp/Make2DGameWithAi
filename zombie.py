@@ -1,5 +1,6 @@
 from math import atan2, hypot, pi
 
+from human_npc import HumanNPC
 from item_data import TREE_DAMAGE
 
 
