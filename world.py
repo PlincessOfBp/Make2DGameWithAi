@@ -208,15 +208,8 @@ class World:
             zombie.purify_at = self.resource_time + 10
             player.infection = min(100, player.infection + 10)
         else:
-            zombie.health = max(0, zombie.health - WEAPON_DAMAGE[weapon])
-            if zombie.health == 0:
-                zombie.state = "dead"
-                zombie.purify_at = None
-                if self.random.random() < 0.35:
-                    item = self.random.choice(("axe", "knife", "canned_food"))
-                    self.pickups[f"zombie:{zombie.entity_id}"] = (
-                        item, zombie.x, zombie.y, self.building_at(zombie.x, zombie.y),
-                    )
+            self.attack_target = zombie
+            self.hit_zombie(zombie, WEAPON_DAMAGE[weapon])
 
     def hit_zombie(self, zombie, damage):
         if zombie.state != "zombie":
