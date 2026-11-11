@@ -184,4 +184,14 @@ class PlayerUI:
         return True
 
     def draw_ally(self, images):
-        pass
+        if self.ally is None:
+            return
+        self.panel(images, "panel", ALLY_LEFT, ALLY_TOP, 320, 224)
+        title = "채집 자원 선택" if self.gather_menu else "조력자 명령"
+        self.text(ALLY_LEFT + 27, ALLY_TOP - 25, title)
+        options = GATHER_COMMANDS if self.gather_menu else ALLY_COMMANDS
+        for index, (_, label) in enumerate(options):
+            top = ALLY_TOP - 52 - index * 34
+            p.draw_rectangle(ALLY_LEFT + 26, top - 28, ALLY_LEFT + 294, top,
+                             64, 66, 65, filled=True)
+            self.text(ALLY_LEFT + 40, top - 14, label)
