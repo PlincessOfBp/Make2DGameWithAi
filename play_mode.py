@@ -302,3 +302,6 @@ class PlayMode:
             p.draw_rectangle(sx - 16, sy + 19, sx + 16, sy + 23, 55, 48, 42, filled=True)
             width = round(32 * hp / TREE_MAX_HP)
             p.draw_rectangle(sx - 16, sy + 19, sx - 16 + width, sy + 23, 222, 174, 79, filled=True)
+
+    def draw_npc(self, zombie):
+        pass
