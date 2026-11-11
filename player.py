@@ -11,6 +11,7 @@ class Player:
         self.x, self.y = 250, 1360
         self.angle = self.target_angle = 0.0
         self.walk_time = 0.0
+        self.items = {}
 
     def move(self, world, horizontal, vertical, dt):
         length = hypot(horizontal, vertical)
