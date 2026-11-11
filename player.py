@@ -78,6 +78,9 @@ class Player:
         self.inventory.remove(item)
         return True
 
+    def take_damage(self, damage, now):
+        pass
+
     def drop_selected(self, world):
         item = self.inventory.slots[self.inventory.selected]
         if item is None or not world.drop_item(self, item):
