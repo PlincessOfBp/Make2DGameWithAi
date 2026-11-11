@@ -1,4 +1,7 @@
-from math import atan2, expm1, hypot, pi, tau
+from math import atan2, cos, expm1, hypot, pi, sin, tau
+
+from inventory import Inventory
+from item_data import WEAPON_COLUMNS
 
 
 class Player:
