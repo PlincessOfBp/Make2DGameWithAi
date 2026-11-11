@@ -114,9 +114,13 @@ class PlayMode:
         x, y = round(player.x) - cam_x, round(player.y) - cam_y
         image = self.images["characters/player.png"]
         if image is not None:
-            walking = player.walk_time > 0
-            frame = int(player.walk_time * player.WALK_FPS) % 4
-            source_y = 1280 if walking else 1344
+            if player.action is None:
+                walking = player.walk_time > 0
+                frame = int(player.walk_time * player.WALK_FPS) % 4
+                source_y = 1280 if walking else 1344
+            else:
+                frame = min(int(player.action_elapsed / 0.12), 2)
+                source_y = 1216 if player.action == "attack" else 1152
             image.clip_composite_draw(frame * 64, source_y, 64, 64,
                                       player.angle, "", x, y, 64, 64)
         else:
