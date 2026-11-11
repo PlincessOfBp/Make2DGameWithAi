@@ -262,6 +262,11 @@ class PlayMode:
                                       "", x, y, 64, 64)
         else:
             p.draw_rectangle(x-8, y-8, x+8, y+8, 82, 154, 84, filled=True)
+        if human and human.tool and zombie.state != "dead":
+            gathering = self.world.resource_time < human.gather_until
+            elapsed = self.world.resource_time - (human.gather_until - GATHER_FRAME_TIME * 2)
+            swing = (elapsed / (GATHER_FRAME_TIME * 2) * 2 - 1) * 1.134 if gathering else None
+            self.draw_held_weapon(human.tool, zombie.angle, x, y, 10 if gathering else 0, swing)
         if zombie.purify_at is not None:
             icon = self.images["ui/purifying.png"]
             if icon is not None:
