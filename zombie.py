@@ -37,6 +37,8 @@ class Zombie:
             self.purify_at = None
             self.state = "ally" if world.random.random() < 0.5 else "fleeing"
             self.health = 50
+            self.human = True
+            self.next_hit = world.resource_time
         if self.state == "fleeing":
             edge = 8 if self.x < 1200 else 2392
             self.move_toward(world, edge, self.y, dt, 190, 0)
