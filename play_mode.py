@@ -45,6 +45,13 @@ class PlayMode:
             elif event.type == p.SDL_MOUSEMOTION:
                 self.mouse = (event.x, SCREEN_HEIGHT - 1 - event.y)
 
+            elif event.type == p.SDL_MOUSEBUTTONDOWN and event.button == p.SDL_BUTTON_RIGHT:
+                cam_x, cam_y = self.camera
+                mouse_x, mouse_y = event.x + cam_x, SCREEN_HEIGHT - 1 - event.y + cam_y
+                item = self.world.collect_pickup(self.player.x, self.player.y, mouse_x, mouse_y)
+                if item is not None:
+                    self.player.items[item] = self.player.items.get(item, 0) + 1
+
     def update(self, dt):
         horizontal = (p.SDLK_d in self.keys) - (p.SDLK_a in self.keys)
         vertical = (p.SDLK_w in self.keys) - (p.SDLK_s in self.keys)
