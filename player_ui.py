@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pico2d as p
 
+from human_npc import GATHER_LIMIT
 from item_data import ITEM_ICON_CELLS, ITEM_NAMES, RECIPES
 
 
