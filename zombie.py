@@ -19,6 +19,7 @@ class Zombie:
         self.command = "wait"
         self.command_target = None
         self.attack_until = 0.0
+        self.hurt_until = 0.0
         self.human = False
 
     def move_toward(self, world, x, y, dt, speed, stop):
@@ -61,8 +62,11 @@ class Zombie:
                         player.take_damage(5, world.resource_time)
                     else:
                         target.health = max(0, target.health - 5)
-                    if target is not player and target.health == 0:
-                        target.state = "dead"
+                    if target is not player:
+                        if target.health == 0:
+                            target.state = "dead"
+                        else:
+                            target.hurt_until = world.resource_time + 0.16
                     self.next_hit = world.resource_time + 2
                     self.attack_until = world.resource_time + 0.24
             elif distance <= 280:

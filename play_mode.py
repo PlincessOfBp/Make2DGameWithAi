@@ -245,13 +245,16 @@ class PlayMode:
             if image is not None:
                 if zombie.state == "dead":
                     row, frame = (4 if human else 3), 0
+                elif self.world.resource_time < zombie.hurt_until:
+                    row, frame = (5 if human else 4), 0
                 elif self.world.resource_time < zombie.attack_until:
                     row, frame = 2, 1
                 else:
                     row = int(zombie.walk_time > 0)
                     frame = int(zombie.walk_time * 9) % 4 if row == 1 else 0
-                image.clip_composite_draw(frame * 64, (4 if human else 3) * 64 - row * 64,
-                                          64, 64, zombie.angle, "", x, y, 64, 64)
+                image.clip_composite_draw(frame * 64, image.h - (row + 1) * 64,
+                                          64, 64, 0 if zombie.state == "dead" else zombie.angle,
+                                          "", x, y, 64, 64)
             else:
                 p.draw_rectangle(x-8, y-8, x+8, y+8, 82, 154, 84, filled=True)
             if zombie.purify_at is not None:

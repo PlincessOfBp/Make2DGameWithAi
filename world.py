@@ -217,6 +217,7 @@ class World:
             return
         zombie.health = max(0, zombie.health - damage)
         if zombie.health:
+            zombie.hurt_until = self.resource_time + 0.16
             return
         zombie.state = "dead"
         zombie.purify_at = None
