@@ -185,4 +185,13 @@ class Zombie:
             self.route.pop(0)
 
     def see_target(self, world, player):
-        pass
+        humans = (actor for actor in world.zombies if actor.state in ("ally", "fleeing"))
+        nearest = None
+        distance = SIGHT_RANGE
+        for actor in (player, *humans):
+            if actor.health <= 0:
+                continue
+            candidate_distance = hypot(actor.x - self.x, actor.y - self.y)
+            if candidate_distance <= distance and world.pickup_path_clear(self.x, self.y, actor.x, actor.y):
+                nearest, distance = actor, candidate_distance
+        return nearest
