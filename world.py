@@ -110,12 +110,13 @@ class World:
             if location is None or location == building:
                 yield pickup_id, item, px, py
 
-    def pickup_path_clear(self, x, y, target_x, target_y, clearance=0):
+    def pickup_path_clear(self, x, y, target_x, target_y, clearance=0, obstacles=None):
 
         dx, dy = target_x - x, target_y - y
         min_x, max_x = sorted((x, target_x))
         min_y, max_y = sorted((y, target_y))
-        for left, bottom, right, top in self.walls:
+        walls = self.walls if obstacles is None else obstacles
+        for left, bottom, right, top in walls:
             left, bottom = left - clearance, bottom - clearance
             right, top = right + clearance, top + clearance
             if max_x <= left or min_x >= right or max_y <= bottom or min_y >= top:
