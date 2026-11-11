@@ -61,7 +61,7 @@ class PlayMode:
                 elif event.key == p.SDLK_i:
                     self.ui.ally = None
                     self.ui.page = "inventory" if self.ui.page is None else None
-                elif self.ui.page is None and event.key == p.SDLK_e:
+                elif self.ui.page is None and self.ui.ally is None and event.key == p.SDLK_e:
                     self.player.use_selected(self.world)
                 elif self.ui.page is None and event.key == p.SDLK_b:
                     cam_x, cam_y = self.camera
