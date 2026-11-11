@@ -141,6 +141,7 @@ class PlayMode:
         self.ui.draw_hud(self.images, self.player, remaining)
         self.ui.draw_ally(self.images)
         self.ui.draw_window(self.images, self.player)
+        self.ui.draw_drag(self.images, self.player, self.mouse)
 
     def draw_buildings(self, interiors):
         cam_x, cam_y = self.camera
