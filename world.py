@@ -2,7 +2,7 @@ from itertools import count
 from math import cos, hypot, pi, sin
 from random import Random
 
-from item_data import TREE_DAMAGE, TREE_MAX_HP, WEAPON_DAMAGE, WOOD_TOOLS
+from item_data import TREE_DAMAGE, TREE_MAX_HP, WEAPON_DAMAGE
 from zombie import Zombie
 
 from town import (
@@ -184,7 +184,7 @@ class World:
         reach = 46 if action == "bite" else 78
         targets = [(z.x, z.y, z) for z in self.zombies if z.state == "zombie"
                    and (action != "bite" or z.purify_at is None)]
-        if action == "attack" and weapon in WOOD_TOOLS:
+        if action == "attack" and weapon in TREE_DAMAGE:
             targets.extend((x, y, None) for x, y in self.trees)
         hits = []
         for x, y, zombie in targets:
@@ -202,7 +202,7 @@ class World:
             return
         _, zombie, position = min(hits, key=lambda hit: hit[0])
         if zombie is None:
-            self.harvest_tree(player, position)
+            self.hit_tree(position, weapon)
         elif action == "bite":
             zombie.purify_at = self.resource_time + 10
             player.infection = min(100, player.infection + 10)
