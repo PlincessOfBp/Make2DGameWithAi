@@ -35,4 +35,21 @@ class HumanNPC:
         self.actor.attack_until = 0.0
 
     def flee(self, world, dt):
-        pass
+        actor = self.actor
+        if self.destination is None:
+            x, y = actor.x, actor.y
+            edges = ((8, y), (MAP_WIDTH - 8, y), (x, 8), (x, MAP_HEIGHT - 8))
+            for goal in sorted(edges, key=lambda point: hypot(point[0] - x, point[1] - y)):
+                route = world.find_route((x, y), goal, 8)
+                if route:
+                    self.destination = goal
+                    actor.route, actor.route_goal = route, goal
+                    break
+        if self.destination is None:
+            actor.walk_time = 0.0
+            return
+        actor.follow_route(world, self.destination, dt, 0, speed=190)
+        if hypot(actor.x - self.destination[0], actor.y - self.destination[1]) < 0.01:
+            actor.state = "escaped"
+        elif not actor.route and not actor.walk_time and world.resource_time >= actor.next_route_at:
+            self.destination = None
