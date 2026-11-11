@@ -218,3 +218,6 @@ class Zombie:
             self.attack_target = target
             self.attack_until = now + ATTACK_FRAME_TIME * 3
             self.next_hit = now + NPC_ATTACK_INTERVAL
+
+    def advance_attack(self, world, player):
+        pass
