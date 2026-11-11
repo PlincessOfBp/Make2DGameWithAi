@@ -112,3 +112,6 @@ class PlayerUI:
             if item is not None:
                 self.icon(images, item, x, y, inventory.items[item])
             self.text(x - 20, y + 16, str(index + 1))
+
+    def draw_window(self, images, player):
+        pass
