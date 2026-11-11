@@ -314,4 +314,31 @@ class HumanNPC:
         return True
 
     def plan_melee_route(self, world, target, obstacles):
-        pass
+        actor = self.actor
+        start = (actor.x, actor.y)
+        heading = atan2(actor.y - target.y, actor.x - target.x)
+        reservations = [
+            npc.human.melee_route[-1]
+            for npc in world.zombies
+            if npc is not actor and npc.state == "ally" and npc.human is not None
+            and npc.human.melee_target == target.entity_id and npc.human.melee_route
+        ]
+        for turn in (0, 1, -1, 2, -2, 3, -3, 4):
+            angle = heading + turn * tau / 8
+            x = target.x + cos(angle) * MELEE_STAND_DISTANCE
+            y = target.y + sin(angle) * MELEE_STAND_DISTANCE
+            goal = (x, y)
+            if not (actor.RADIUS <= x <= MAP_WIDTH - actor.RADIUS
+                    and actor.RADIUS <= y <= MAP_HEIGHT - actor.RADIUS):
+                continue
+            if any(abs(x - px) < actor.RADIUS * 2 and abs(y - py) < actor.RADIUS * 2
+                   for px, py in reservations):
+                continue
+            if (not world.pickup_path_clear(x, y, x, y, actor.RADIUS, obstacles)
+                    or not world.pickup_path_clear(x, y, target.x, target.y)):
+                continue
+            route = world.find_route(start, goal, actor.RADIUS, obstacles)
+            length = sum(hypot(b[0] - a[0], b[1] - a[1]) for a, b in zip([start] + route, route))
+            if route and length <= hypot(target.x - actor.x, target.y - actor.y) + 96:
+                return route
+        return []
