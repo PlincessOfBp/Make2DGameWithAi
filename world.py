@@ -94,4 +94,20 @@ class World:
                 yield pickup_id, item, px, py
 
     def pickup_path_clear(self, x, y, target_x, target_y):
-        pass
+
+        dx, dy = target_x - x, target_y - y
+        for left, bottom, right, top in self.walls:
+            # Intersect the segment's parameter range with the rectangle on each axis.
+            start, end = 0.0, 1.0
+            for origin, delta, low, high in ((x, dx, left, right), (y, dy, bottom, top)):
+                if delta == 0:
+                    if not low < origin < high:
+                        break
+                    continue
+                first, last = sorted(((low - origin) / delta, (high - origin) / delta))
+                start, end = max(start, first), min(end, last)
+                if start >= end:
+                    break
+            else:
+                return False
+        return True
