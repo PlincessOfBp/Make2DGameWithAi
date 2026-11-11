@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pico2d as p
 
+from player import Player
 from town import SCREEN_HEIGHT, SCREEN_WIDTH
 from world import World
 
@@ -12,9 +13,12 @@ ASSETS = Path(__file__).resolve().parent / "assets"
 class PlayMode:
     def enter(self):
         self.world = World()
-        self.camera = self.world.camera(250, 1360)
+        self.player = Player()
+        self.keys = set()
+        self.mouse = None
+        self.camera = self.world.camera(self.player.x, self.player.y)
         self.images = {}
-        paths = {"world/ground.png"}
+        paths = {"world/ground.png", "characters/player.png"}
         for kind, *_ in self.world.buildings:
             for layer in ("interior", "roof"):
                 paths.add(f"world/buildings/{kind}_{layer}.png")
