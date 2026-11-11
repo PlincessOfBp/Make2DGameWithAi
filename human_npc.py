@@ -11,4 +11,10 @@ GATHER_RANGE = 250
 
 class HumanNPC:
     def __init__(self, actor):
-        pass
+        self.actor = actor
+        self.command = "wait"
+        self.target = None
+        self.destination = None
+        self.gather_until = 0.0
+        self.gather_pending = False
+        self.tool = None
