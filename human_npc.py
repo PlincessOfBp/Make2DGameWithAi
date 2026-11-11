@@ -239,3 +239,6 @@ class HumanNPC:
             actor.start_attack(target, world.resource_time)
         else:
             actor.follow_route(world, (target.x, target.y), dt, 27, speed=215)
+
+    def can_take_gathered(self):
+        pass
