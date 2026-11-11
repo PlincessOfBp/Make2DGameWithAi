@@ -8,7 +8,12 @@ from town import (
 class World:
     def __init__(self):
         self.buildings = []
-        self.walls = []
+        self.trees = TREE_TRUNKS
+        self.walls = [
+            (x - TREE_TRUNK_HALF_WIDTH, y - TREE_TRUNK_HALF_HEIGHT,
+             x + TREE_TRUNK_HALF_WIDTH, y + TREE_TRUNK_HALF_HEIGHT)
+            for x, y in self.trees
+        ]
         self.furniture = {}
         for kind, x, y in BUILDINGS:
             (image_width, image_height), rooms, walls = BUILDING_LAYOUTS[kind]
