@@ -170,25 +170,44 @@ class PlayerUI:
                              *((111, 90, 53) if enabled else (60, 63, 65)), filled=True)
             self.text(CRAFT_X + 326, CRAFT_TOP - 237, "제작" if enabled else "재료 부족")
 
-    def click_ally(self, world, x, y, button):
+    def click_ally(self, world, x, y, button, player=None):
         if self.ally is None:
             return False
-        if self.ally.state != "ally":
+        if self.ally.state != "ally" or (
+            player is not None and not world.can_command_ally(player, self.ally)
+        ):
             self.ally = None
             return True
         if button != p.SDL_BUTTON_LEFT:
             self.ally = None
             return True
-        options = GATHER_COMMANDS if self.gather_menu else ALLY_COMMANDS
-        offset = ALLY_TOP - 52 - y
-        if ALLY_LEFT + 26 <= x < ALLY_LEFT + 294 and 0 <= offset < len(options) * 34 and offset % 34 < 28:
-            command, _ = options[offset // 34]
-            if command in ("gather", "back"):
-                self.gather_menu = command == "gather"
-            else:
-                self.ally.set_command(world, command)
+        for action, _, left, bottom, right, top, enabled in self.ally_buttons():
+            if not (left <= x < right and bottom <= y < top):
+                continue
+            if not enabled:
+                return True
+            if action == "gather":
+                self.gather_menu = True
+                self.gather_resource, self.gather_amount = "wood", 1
+            elif action in ("wood", "stone"):
+                self.gather_resource = action
+            elif action == "more":
+                self.gather_amount += 1
+            elif action == "less":
+                self.gather_amount -= 1
+            elif action == "back":
+                self.gather_menu = False
+            elif action == "start":
+                self.ally.set_command(world, self.gather_resource, self.gather_amount)
                 self.ally = None
-        elif not (ALLY_LEFT <= x < ALLY_LEFT + 320 and ALLY_TOP - 224 < y <= ALLY_TOP):
+            elif action == "take":
+                if player is not None:
+                    self.ally.human.take_gathered(player)
+            else:
+                self.ally.set_command(world, action)
+                self.ally = None
+            return True
+        if not (ALLY_LEFT <= x < ALLY_LEFT + 320 and ALLY_TOP - 224 < y <= ALLY_TOP):
             self.ally = None
         return True
 
