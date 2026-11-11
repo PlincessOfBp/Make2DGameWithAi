@@ -104,6 +104,8 @@ class PlayMode:
         self.player.update_action(self.world, dt)
         for zombie in self.world.zombies:
             zombie.update(self.world, self.player, dt)
+        if self.ui.ally is not None and self.ui.ally.state != "ally":
+            self.ui.ally = None
         if self.player.health == 0:
             self.ui.result = "게임 오버 · 사망"
         elif self.player.infection >= 100:
