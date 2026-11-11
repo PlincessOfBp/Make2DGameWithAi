@@ -196,4 +196,9 @@ class HumanNPC:
             self.protect(world, dt)
 
     def take_gathered(self, player):
-        pass
+        if self.command in ("wood", "stone", "return") or not self.inventory.items:
+            return False
+        for item, count in self.inventory.items.items():
+            player.inventory.add(item, count)
+        self.inventory.items.clear()
+        return True
