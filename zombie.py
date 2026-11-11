@@ -195,3 +195,6 @@ class Zombie:
             if candidate_distance <= distance and world.pickup_path_clear(self.x, self.y, actor.x, actor.y):
                 nearest, distance = actor, candidate_distance
         return nearest
+
+    def hunt(self, world, player, dt):
+        pass
