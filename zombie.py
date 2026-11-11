@@ -89,3 +89,6 @@ class Zombie:
                          key=lambda z: hypot(z.x - self.x, z.y - self.y), default=None)
             if threat is not None and hypot(threat.x - self.x, threat.y - self.y) < 160:
                 self.move_toward(world, self.x * 2 - threat.x, self.y * 2 - threat.y, dt, 215, 0)
+
+    def gather(self, world, player, dt):
+        pass
