@@ -262,7 +262,8 @@ class PlayMode:
                                       "", x, y, 64, 64)
         else:
             p.draw_rectangle(x-8, y-8, x+8, y+8, 82, 154, 84, filled=True)
-        if human and human.tool and zombie.state != "dead":
+        if (human and human.tool and zombie.state != "dead"
+                and self.world.resource_time >= zombie.attack_until):
             gathering = self.world.resource_time < human.gather_until
             elapsed = self.world.resource_time - (human.gather_until - GATHER_FRAME_TIME * 2)
             swing = (elapsed / (GATHER_FRAME_TIME * 2) * 2 - 1) * 1.134 if gathering else None
