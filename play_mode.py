@@ -82,7 +82,6 @@ class PlayMode:
                     continue
                 if self.ui.click(self.player, x, y, event.button):
                     continue
-                self.mouse = (x, y)
                 cam_x, cam_y = self.camera
                 target = (x + cam_x, y + cam_y)
                 if event.button == p.SDL_BUTTON_LEFT:
