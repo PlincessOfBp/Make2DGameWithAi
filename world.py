@@ -353,4 +353,14 @@ class World:
                 and self.pickup_path_clear(player.x, player.y, ally.x, ally.y))
 
     def collision_obstacles(self, actor=None):
-        pass
+        if actor is None:
+            return self.walls
+        bodies = (self.player, *self.zombies)
+        return self.walls + [
+            (body.x - body.RADIUS, body.y - body.RADIUS,
+             body.x + body.RADIUS, body.y + body.RADIUS)
+            for body in bodies
+            if body is not None and body is not actor
+            and getattr(body, "state", None) not in ("dead", "escaped")
+            and body.health > 0
+        ]
