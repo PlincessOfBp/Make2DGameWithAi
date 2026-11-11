@@ -91,4 +91,36 @@ class Zombie:
                 self.move_toward(world, self.x * 2 - threat.x, self.y * 2 - threat.y, dt, 215, 0)
 
     def gather(self, world, player, dt):
-        pass
+        if self.command == "wood":
+            has_axe = any(player.items.get(item, 0) for item in ("axe", "stone_axe"))
+            targets = world.trees if has_axe else ()
+        else:
+            targets = [(x, y) for _, item, x, y in world.visible_pickups(self.x, self.y)
+                       if item == "stone"]
+        if self.command_target not in targets:
+            self.command_target = min(targets, key=lambda t: hypot(t[0] - self.x, t[1] - self.y),
+                                      default=None)
+        if self.command_target is None:
+            self.set_command(world, "wait")
+            return
+        x, y = self.command_target
+        distance = hypot(x - self.x, y - self.y)
+        if distance > 250:
+            self.set_command(world, "wait")
+        elif distance > 35:
+            self.move_toward(world, x, y, dt, 200, 32)
+            if not self.walk_time:
+                self.set_command(world, "wait")
+            return
+        elif self.command == "wood":
+            if distance == 0 or world.pickup_path_clear(
+                self.x, self.y, x - (x - self.x) * 15 / distance, y - (y - self.y) * 15 / distance
+            ):
+                world.harvest_tree(player, (x, y))
+            self.set_command(world, "wait")
+        else:
+            item = world.collect_pickup(self.x, self.y, x, y)
+            if item is not None:
+                player.inventory.add(item)
+            self.set_command(world, "wait")
+        self.walk_time = 0.0
