@@ -26,6 +26,8 @@ class PlayerUI:
         self.recipe = next(iter(RECIPES))
         self.font = None
         self.result = None
+        self.ally = None
+        self.gather_menu = False
 
     def load_font(self):
         windows = Path(environ.get("WINDIR", "C:/Windows")) / "Fonts"
