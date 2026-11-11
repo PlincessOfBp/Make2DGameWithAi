@@ -62,3 +62,6 @@ class Zombie:
     def set_command(self, world, command):
         self.command_target = world.attack_target if command == "attack" else None
         self.command = command
+
+    def update_ally(self, world, player, dt):
+        pass
