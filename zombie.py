@@ -58,3 +58,6 @@ class Zombie:
                 self.move_toward(world, player.x, player.y, dt, self.speed, 27)
             else:
                 self.walk_time = 0.0
+
+    def set_command(self, world, command):
+        pass
