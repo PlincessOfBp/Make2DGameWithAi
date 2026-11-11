@@ -150,4 +150,16 @@ class World:
                 del self.stone_respawns[pickup_id]
 
     def place_barricade(self, player, x, y):
-        pass
+        left, bottom, right, top = x - 29, y - 14, x + 29, y + 14
+        if left < 0 or bottom < 0 or right > MAP_WIDTH or top > MAP_HEIGHT:
+            return False
+        if any(left < r and right > l and bottom < t and top > b for l, b, r, t in self.walls):
+            return False
+        actors = [player, *(z for z in self.zombies if z.state not in ("dead", "escaped"))]
+        if any(left - 8 < actor.x < right + 8 and bottom - 8 < actor.y < top + 8 for actor in actors):
+            return False
+        if any(left <= px <= right and bottom <= py <= top for _, px, py, _ in self.pickups.values()):
+            return False
+        self.walls.append((left, bottom, right, top))
+        self.barricades.append((x, y))
+        return True
