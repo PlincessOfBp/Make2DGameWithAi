@@ -74,3 +74,34 @@ TREE_TRUNKS = (
 TREE_TRUNK_HALF_WIDTH = 11
 TREE_TRUNK_HALF_HEIGHT = 8
 TREE_DRAW_OFFSET = 49
+
+# One stone may be active at each outdoor spawn point.
+STONE_POINTS = (
+    (309, 1350), (540, 1450), (958, 1670), (1325, 1450),
+    (1815, 1300), (2330, 1250), (530, 730), (1000, 690),
+    (540, 235), (1410, 555), (1770, 660), (2260, 322),
+)
+STONE_RESPAWN_SECONDS = 20
+STONE_SPAWN_CLEARANCE = 24
+
+# Each entry matches BUILDINGS by index. Offsets use each building center.
+FARMING_LOOT = (
+    (("axe", -48, -68), ("canned_food", 32, -48)),
+    (("nails", -80, -68), ("tape", -48, -16)),
+    (("canned_food", -45, -48), ("tape", 42, -20)),
+    (("axe", -45, -48), ("nails", 42, -20)),
+    (("canned_food", -80, -68), ("nails", -48, -16)),
+    (("tape", -48, -68), ("canned_food", 32, -48)),
+    (("nails", -48, -68), ("tape", 32, -48)),
+    (("canned_food", -48, -68), ("axe", 32, -48)),
+)
+
+ITEM_ICON_CELLS = {
+    "stone": (32, 32),
+    "axe": (64, 32),
+    "nails": (96, 32),
+    "tape": (128, 32),
+    "canned_food": (0, 0),
+}
+PICKUP_REACH = 64
+PICKUP_ICON_HALF_SIZE = 16
