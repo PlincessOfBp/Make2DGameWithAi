@@ -1,3 +1,4 @@
+from heapq import heappop, heappush
 from itertools import count
 from math import cos, hypot, pi, sin
 from random import Random
