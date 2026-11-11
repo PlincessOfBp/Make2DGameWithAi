@@ -17,8 +17,8 @@ ASSETS = Path(__file__).resolve().parent / "assets"
 
 class PlayMode:
     def enter(self):
-        self.world = World()
         self.player = Player()
+        self.world = World(self.player)
         self.ui = PlayerUI()
         self.ui.load_font()
         self.keys = set()
