@@ -165,4 +165,42 @@ class World:
         return True
 
     def resolve_player_action(self, player, action, angle, weapon):
-        pass
+        forward_x, forward_y = -sin(angle), cos(angle)
+        reach = 46 if action == "bite" else 78
+        targets = [(z.x, z.y, z) for z in self.zombies if z.state == "zombie"
+                   and (action != "bite" or z.purify_at is None)]
+        if action == "attack" and weapon in WOOD_TOOLS:
+            targets.extend((x, y, None) for x, y in self.trees)
+        hits = []
+        for x, y, zombie in targets:
+            dx, dy = x - player.x, y - player.y
+            distance = hypot(dx, dy)
+            if distance > reach or dx * forward_x + dy * forward_y < distance * 0.65:
+                continue
+            if zombie is None and distance:
+                # Stop the ray just before the target tree's own trunk.
+                x -= dx * min(1, 15 / distance)
+                y -= dy * min(1, 15 / distance)
+            if self.pickup_path_clear(player.x, player.y, x, y):
+                hits.append((distance, zombie, (player.x + dx, player.y + dy)))
+        if not hits:
+            return
+        _, zombie, position = min(hits, key=lambda hit: hit[0])
+        if zombie is None:
+            self.trees.remove(position)
+            self.walls.remove(self.tree_walls[position])
+            self.tree_respawns[position] = self.resource_time + TREE_RESPAWN_SECONDS
+            player.inventory.add("wood")
+        elif action == "bite":
+            zombie.purify_at = self.resource_time + 10
+            player.infection = min(100, player.infection + 10)
+        else:
+            zombie.health = max(0, zombie.health - WEAPON_DAMAGE[weapon])
+            if zombie.health == 0:
+                zombie.state = "dead"
+                zombie.purify_at = None
+                if self.random.random() < 0.35:
+                    item = self.random.choice(("axe", "knife", "canned_food"))
+                    self.pickups[f"zombie:{zombie.entity_id}"] = (
+                        item, zombie.x, zombie.y, self.building_at(zombie.x, zombie.y),
+                    )
