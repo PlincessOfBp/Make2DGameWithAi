@@ -249,6 +249,8 @@ class HumanNPC:
                     and hypot(target.x - player.x, target.y - player.y) <= ASSIST_RANGE):
                 self.fight(world, target, dt)
             else:
+                self.melee_route.clear()
+                self.melee_target = None
                 actor.follow_route(world, (player.x, player.y), dt, 55, speed=215)
         elif self.command == "attack":
             target = world.actor_by_id(self.target)
