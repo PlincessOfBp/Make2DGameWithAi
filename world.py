@@ -2,7 +2,7 @@ from itertools import count
 from math import cos, hypot, pi, sin
 from random import Random
 
-from item_data import WEAPON_DAMAGE, WOOD_TOOLS
+from item_data import TREE_DAMAGE, TREE_MAX_HP, WEAPON_DAMAGE, WOOD_TOOLS
 from zombie import Zombie
 
 from town import (
@@ -17,7 +17,7 @@ from town import (
 class World:
     def __init__(self):
         self.buildings = []
-        self.trees = list(TREE_TRUNKS)
+        self.trees = dict.fromkeys(TREE_TRUNKS, TREE_MAX_HP)
         self.tree_walls = {
             (x, y): (x - TREE_TRUNK_HALF_WIDTH, y - TREE_TRUNK_HALF_HEIGHT,
                      x + TREE_TRUNK_HALF_WIDTH, y + TREE_TRUNK_HALF_HEIGHT)
@@ -160,7 +160,7 @@ class World:
             overlaps_wall = any(left < r and right > l and bottom < t and top > b
                                 for l, b, r, t in self.walls)
             if self.resource_time >= ready_at and not occupied and not overlaps_wall:
-                self.trees.append((x, y))
+                self.trees[x, y] = TREE_MAX_HP
                 self.walls.append(wall)
                 del self.tree_respawns[x, y]
 
@@ -227,7 +227,7 @@ class World:
     def harvest_tree(self, player, position):
         if position not in self.trees:
             return False
-        self.trees.remove(position)
+        del self.trees[position]
         self.walls.remove(self.tree_walls[position])
         self.tree_respawns[position] = self.resource_time + TREE_RESPAWN_SECONDS
         player.inventory.add("wood")
