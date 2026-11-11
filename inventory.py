@@ -34,4 +34,9 @@ class Inventory:
                                        for material, count in RECIPES[item].items())
 
     def craft(self, item):
-        pass
+        if not self.can_craft(item):
+            return False
+        for material, count in RECIPES[item].items():
+            self.remove(material, count)
+        self.add(item)
+        return True
