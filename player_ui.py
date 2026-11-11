@@ -202,3 +202,6 @@ class PlayerUI:
         if 0 <= dx < 5 * 54 and dx % 54 < 48 and 0 <= dy < 48:
             return dx // 54
         return None
+
+    def release(self, player, x, y, button):
+        pass
