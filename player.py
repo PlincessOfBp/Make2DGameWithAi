@@ -52,4 +52,12 @@ class Player:
         return True
 
     def update_action(self, world, dt):
-        pass
+        self.infection = max(0.0, self.infection - dt * (2 / 60))
+        if self.action is None:
+            return
+        previous = self.action_elapsed
+        self.action_elapsed += dt
+        if previous < 0.12 <= self.action_elapsed:
+            world.resolve_player_action(self, self.action, self.action_angle, self.action_weapon)
+        if self.action_elapsed >= 0.36:
+            self.action = None
