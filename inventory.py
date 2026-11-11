@@ -22,4 +22,9 @@ class Inventory:
                 self.slots[self.slots.index(item)] = None
 
     def assign(self, item):
-        pass
+        if item not in self.items or item not in HOTBAR_ITEMS:
+            return
+        if item in self.slots:
+            previous = self.slots.index(item)
+            self.slots[previous] = self.slots[self.selected]
+        self.slots[self.selected] = item
