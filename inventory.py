@@ -48,4 +48,5 @@ class Inventory:
         return [item for item in self.items if item not in self.slots]
 
     def unassign(self, item):
-        pass
+        if item in self.slots:
+            self.slots[self.slots.index(item)] = None
