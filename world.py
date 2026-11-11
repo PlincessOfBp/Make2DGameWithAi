@@ -276,3 +276,6 @@ class World:
         x, y = position
         self.pickups[f"drop:{next(self.drop_ids)}"] = ("wood", x, y, self.building_at(x, y))
         return True
+
+    def find_route(self, start, goal, radius):
+        pass
