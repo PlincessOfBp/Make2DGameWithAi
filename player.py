@@ -78,4 +78,8 @@ class Player:
         return True
 
     def drop_selected(self, world):
-        pass
+        item = self.inventory.slots[self.inventory.selected]
+        if item is None or not world.drop_item(self, item):
+            return False
+        self.inventory.remove(item)
+        return True
