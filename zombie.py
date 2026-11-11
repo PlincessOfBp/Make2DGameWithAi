@@ -139,11 +139,12 @@ class Zombie:
         self.walk_time = 0.0
 
     def follow_route(self, world, goal, dt, stop, speed=None):
+        speed = self.speed if speed is None else speed
         start = (self.x, self.y)
         if world.pickup_path_clear(*start, *goal, CHASE_RADIUS):
             self.route.clear()
             self.route_goal = None
-            self.move_toward(world, *goal, dt, self.speed, stop)
+            self.move_toward(world, *goal, dt, speed, stop)
             return
 
         if self.route and not world.pickup_path_clear(*start, *self.route[0], CHASE_RADIUS):
@@ -159,7 +160,7 @@ class Zombie:
             self.walk_time = 0.0
             return
         waypoint = self.route[0]
-        self.move_toward(world, *waypoint, dt, self.speed, 0)
+        self.move_toward(world, *waypoint, dt, speed, 0)
         if hypot(self.x - waypoint[0], self.y - waypoint[1]) < 0.01:
             self.route.pop(0)
 
