@@ -4,7 +4,7 @@ from pathlib import Path
 import pico2d as p
 
 from player import Player
-from item_data import ITEM_ICON_CELLS, WEAPON_COLUMNS
+from item_data import ITEM_ICON_CELLS, TREE_MAX_HP, WEAPON_COLUMNS
 from player_ui import PlayerUI, UI_ASSETS
 from town import PICKUP_ICON_HALF_SIZE, SCREEN_HEIGHT, SCREEN_WIDTH, TREE_DRAW_OFFSET
 from world import World
@@ -202,7 +202,7 @@ class PlayMode:
 
         cam_x, cam_y = self.camera
         image = self.images["world/props/tree.png"]
-        for x, y in self.world.trees:
+        for (x, y), hp in self.world.trees.items():
             if (y < self.player.y) != foreground:
                 continue
             sx, sy = x - cam_x, y - cam_y
@@ -211,6 +211,10 @@ class PlayMode:
             else:
                 p.draw_rectangle(sx - 9, sy - 8, sx + 9, sy + 16, 105, 73, 40, filled=True)
                 p.draw_rectangle(sx - 40, sy + 16, sx + 40, sy + 80, 66, 105, 46, filled=True)
+            if hp < TREE_MAX_HP:
+                p.draw_rectangle(sx - 16, sy + 19, sx + 16, sy + 23, 55, 48, 42, filled=True)
+                width = round(32 * hp / TREE_MAX_HP)
+                p.draw_rectangle(sx - 16, sy + 19, sx - 16 + width, sy + 23, 222, 174, 79, filled=True)
 
     def draw_pickups(self):
         cam_x, cam_y = self.camera
