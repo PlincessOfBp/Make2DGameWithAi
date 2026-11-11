@@ -39,3 +39,6 @@ class Player:
             self.target_angle = atan2(dy, dx) - pi / 2
         difference = (self.target_angle - self.angle + pi) % tau - pi
         self.angle = (self.angle + difference * -expm1(-self.TURN_RESPONSE * dt)) % tau
+
+    def start_action(self, action, target_x, target_y):
+        pass
