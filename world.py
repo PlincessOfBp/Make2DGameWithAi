@@ -41,6 +41,16 @@ class World:
                 for a, b, c, d in walls
             )
 
+        # Pickup records contain the item, world position, and optional building index.
+        self.pickups = {
+            f"stone:{index}": ("stone", x, y, None)
+            for index, (x, y) in enumerate(STONE_POINTS)
+        }
+        for index, ((_, x, y, *_), loot) in enumerate(zip(self.buildings, FARMING_LOOT, strict=True)):
+            for slot, (item, dx, dy) in enumerate(loot):
+                self.pickups[f"loot:{index}:{slot}"] = (item, x + dx, y + dy, index)
+        self.stone_respawns = {}
+        self.resource_time = 0.0
 
     def camera(self, x, y):
         return (
