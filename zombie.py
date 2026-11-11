@@ -1,4 +1,4 @@
-from math import atan2, hypot, pi
+from math import atan2, cos, hypot, pi, sin
 
 from human_npc import HumanNPC
 
@@ -38,16 +38,31 @@ class Zombie:
         self.route_goal = None
         self.next_route_at = 0.0
 
-    def move_toward(self, world, x, y, dt, speed, stop):
+    def move_toward(self, world, x, y, dt, speed, stop, steer=True):
         dx, dy = x - self.x, y - self.y
         distance = hypot(dx, dy)
         if distance <= stop:
             self.walk_time = 0.0
             return
-        self.angle = atan2(dy, dx) - pi / 2
-        step = min(speed * dt, distance - stop) / distance
+        heading = atan2(dy, dx)
+        travel = min(speed * dt, distance - stop)
+        step = travel / distance
         position = world.move(self.x, self.y, dx * step, dy * step, self.RADIUS, actor=self)
-        self.walk_time = self.walk_time + dt if position != (self.x, self.y) else 0.0
+        if steer and travel and hypot(position[0] - self.x, position[1] - self.y) < travel * 0.25:
+            # Keep the wall route, but try a short step around moving bodies.
+            side = -1 if self.entity_id % 2 else 1
+            candidates = [position]
+            for offset in (side * pi / 3, -side * pi / 3, side * pi / 2, -side * pi / 2):
+                angle = heading + offset
+                candidates.append(world.move(self.x, self.y, cos(angle) * travel, sin(angle) * travel,
+                                             self.RADIUS, actor=self))
+            position = max(candidates, key=lambda point: (
+                distance - hypot(x - point[0], y - point[1])
+                + hypot(point[0] - self.x, point[1] - self.y) * 0.25
+            ))
+        moved = position != (self.x, self.y)
+        self.angle = (atan2(position[1] - self.y, position[0] - self.x) if moved else heading) - pi / 2
+        self.walk_time = self.walk_time + dt if moved else 0.0
         self.x, self.y = position
 
     def update(self, world, player, dt):
