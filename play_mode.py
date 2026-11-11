@@ -62,7 +62,7 @@ class PlayMode:
             elif event.type == p.SDL_KEYDOWN:
                 self.keys.add(event.key)
                 if p.SDLK_1 <= event.key <= p.SDLK_5:
-                    self.player.inventory.selected = event.key - p.SDLK_1
+                    self.player.inventory.select(event.key - p.SDLK_1)
                 elif event.key == p.SDLK_i:
                     self.ui.ally = None
                     self.ui.dragged_item = None
