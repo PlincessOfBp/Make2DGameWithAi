@@ -16,4 +16,7 @@ UI_ASSETS = (
 
 class PlayerUI:
     def __init__(self):
-        pass
+        self.page = None
+        self.recipe = next(iter(RECIPES))
+        self.font = None
+        self.result = None
