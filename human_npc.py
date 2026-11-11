@@ -15,6 +15,7 @@ class HumanNPC:
         self.command = "wait"
         self.target = None
         self.destination = None
+        self.escape_retry_at = 0.0
         self.gather_until = 0.0
         self.gather_pending = False
         self.tool = None
