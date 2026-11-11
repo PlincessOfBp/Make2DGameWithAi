@@ -28,4 +28,30 @@ class Zombie:
         self.x, self.y = position
 
     def update(self, world, player, dt):
-        pass
+        if self.state in ("dead", "escaped"):
+            return
+        if self.purify_at is not None and world.resource_time >= self.purify_at:
+            self.purify_at = None
+            self.state = "ally" if world.random.random() < 0.5 else "fleeing"
+            self.health = 50
+        if self.state == "fleeing":
+            edge = 8 if self.x < 1200 else 2392
+            self.move_toward(world, edge, self.y, dt, 190, 0)
+            if self.x == edge:
+                self.state = "escaped"
+        elif self.state == "ally":
+            if self.command == "follow":
+                self.move_toward(world, player.x, player.y, dt, 215, 55)
+            else:
+                self.walk_time = 0.0
+        else:
+            distance = hypot(player.x - self.x, player.y - self.y)
+            if distance <= 31 and world.pickup_path_clear(self.x, self.y, player.x, player.y):
+                self.walk_time = 0.0
+                if world.resource_time >= self.next_hit:
+                    player.health = max(0, player.health - 5)
+                    self.next_hit = world.resource_time + 2
+            elif distance <= 280:
+                self.move_toward(world, player.x, player.y, dt, self.speed, 27)
+            else:
+                self.walk_time = 0.0
