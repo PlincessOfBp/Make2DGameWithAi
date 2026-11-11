@@ -22,13 +22,15 @@ class Inventory:
             if item in self.slots:
                 self.slots[self.slots.index(item)] = None
 
-    def assign(self, item):
-        if item not in self.items or item not in HOTBAR_ITEMS:
+    def assign(self, item, slot=None):
+        if item not in self.items:
             return
+        if slot is None:
+            slot = self.selected
         if item in self.slots:
             previous = self.slots.index(item)
-            self.slots[previous] = self.slots[self.selected]
-        self.slots[self.selected] = item
+            self.slots[previous] = self.slots[slot]
+        self.slots[slot] = item
 
     def can_craft(self, item):
         return item in RECIPES and all(self.items.get(material, 0) >= count
