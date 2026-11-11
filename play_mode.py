@@ -88,7 +88,7 @@ class PlayMode:
             elif event.type == p.SDL_MOUSEBUTTONDOWN:
                 x, y = event.x, SCREEN_HEIGHT - 1 - event.y
                 self.mouse = (x, y)
-                if self.ui.click_ally(self.world, x, y, event.button):
+                if self.ui.click_ally(self.world, x, y, event.button, self.player):
                     continue
                 if self.ui.click(self.player, x, y, event.button):
                     continue
