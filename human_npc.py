@@ -68,6 +68,7 @@ class HumanNPC:
         threat = min((npc for npc in world.zombies if npc.state == "zombie"),
                      key=lambda npc: hypot(npc.x - actor.x, npc.y - actor.y), default=None)
         if threat is None or hypot(threat.x - actor.x, threat.y - actor.y) >= 160:
+            actor.walk_time = 0.0
             return
         heading = atan2(actor.y - threat.y, actor.x - threat.x)
         candidates = [
