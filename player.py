@@ -41,4 +41,12 @@ class Player:
         self.angle = (self.angle + difference * -expm1(-self.TURN_RESPONSE * dt)) % tau
 
     def start_action(self, action, target_x, target_y):
-        pass
+        if self.action is not None:
+            return False
+        dx, dy = target_x - self.x, target_y - self.y
+        self.action_angle = atan2(dy, dx) - pi / 2 if dx or dy else self.target_angle
+        selected = self.inventory.slots[self.inventory.selected]
+        self.action_weapon = selected if action == "attack" and selected in WEAPON_COLUMNS else None
+        self.action = action
+        self.action_elapsed = 0.0
+        return True
