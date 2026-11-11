@@ -214,6 +214,7 @@ class World:
             player.infection = min(100, player.infection + 10)
         else:
             self.attack_target = zombie
+            self.attack_target_at = self.resource_time
             self.hit_zombie(zombie, WEAPON_DAMAGE[weapon])
 
     def hit_zombie(self, zombie, damage):
