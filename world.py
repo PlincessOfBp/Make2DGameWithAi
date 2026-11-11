@@ -111,3 +111,6 @@ class World:
             else:
                 return False
         return True
+
+    def collect_pickup(self, x, y, mouse_x, mouse_y):
+        pass
