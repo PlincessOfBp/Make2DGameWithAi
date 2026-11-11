@@ -309,4 +309,11 @@ class PlayMode:
             draw(*args)
 
     def draw_held_weapon(self, item, angle, x, y, hand_y, swing=None):
-        pass
+        image = self.images["items/weapons.png"]
+        if item not in WEAPON_COLUMNS or image is None:
+            return
+        hand_x = round(x + 12 * cos(angle) - hand_y * sin(angle))
+        hand_y = round(y + 12 * sin(angle) + hand_y * cos(angle))
+        rotation = angle if swing is None else angle + swing
+        image.clip_composite_draw(WEAPON_COLUMNS[item] * 64, 64 if swing is None else 0,
+                                  64, 64, rotation, "", hand_x, hand_y, 64, 64)
