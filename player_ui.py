@@ -182,3 +182,6 @@ class PlayerUI:
         elif not (ALLY_LEFT <= x < ALLY_LEFT + 320 and ALLY_TOP - 224 < y <= ALLY_TOP):
             self.ally = None
         return True
+
+    def draw_ally(self, images):
+        pass
