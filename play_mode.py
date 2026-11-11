@@ -48,18 +48,38 @@ class PlayMode:
 
     def handle_events(self, events):
         for event in events:
-            if event.type == p.SDL_KEYDOWN:
-                self.keys.add(event.key)
-            elif event.type == p.SDL_KEYUP:
+            if event.type == p.SDL_KEYUP:
                 self.keys.discard(event.key)
             elif event.type == p.SDL_MOUSEMOTION:
                 self.mouse = (event.x, SCREEN_HEIGHT - 1 - event.y)
-            elif event.type == p.SDL_MOUSEBUTTONDOWN and event.button == p.SDL_BUTTON_RIGHT:
+            elif self.ui.result is not None:
+                continue
+            elif event.type == p.SDL_KEYDOWN:
+                self.keys.add(event.key)
+                if p.SDLK_1 <= event.key <= p.SDLK_5:
+                    self.player.inventory.selected = event.key - p.SDLK_1
+                elif event.key == p.SDLK_i:
+                    self.ui.page = "inventory" if self.ui.page is None else None
+                elif self.ui.page is None and event.key == p.SDLK_e:
+                    self.player.use_selected(self.world)
+                elif self.ui.page is None and event.key == p.SDLK_b:
+                    cam_x, cam_y = self.camera
+                    target = ((self.player.x, self.player.y) if self.mouse is None
+                              else (self.mouse[0] + cam_x, self.mouse[1] + cam_y))
+                    self.player.start_action("bite", *target)
+            elif event.type == p.SDL_MOUSEBUTTONDOWN:
+                x, y = event.x, SCREEN_HEIGHT - 1 - event.y
+                if self.ui.click(self.player, x, y, event.button):
+                    continue
+                self.mouse = (x, y)
                 cam_x, cam_y = self.camera
-                mouse_x, mouse_y = event.x + cam_x, SCREEN_HEIGHT - 1 - event.y + cam_y
-                item = self.world.collect_pickup(self.player.x, self.player.y, mouse_x, mouse_y)
-                if item is not None:
-                    self.player.items[item] = self.player.items.get(item, 0) + 1
+                target = (x + cam_x, y + cam_y)
+                if event.button == p.SDL_BUTTON_LEFT:
+                    self.player.start_action("attack", *target)
+                elif event.button == p.SDL_BUTTON_RIGHT:
+                    item = self.world.collect_pickup(self.player.x, self.player.y, *target)
+                    if item is not None:
+                        self.player.inventory.add(item)
 
     def update(self, dt):
         horizontal = (p.SDLK_d in self.keys) - (p.SDLK_a in self.keys)
