@@ -20,4 +20,16 @@ class HumanNPC:
         self.tool = None
 
     def set_command(self, world, command):
-        pass
+        self.command = command
+        target = world.attack_target
+        self.target = target.entity_id if command == "attack" and target is not None else None
+        self.destination = None
+        self.gather_pending = False
+        self.gather_until = 0.0
+        self.tool = None
+        self.actor.route.clear()
+        self.actor.route_goal = None
+        self.actor.next_route_at = 0.0
+        self.actor.walk_time = 0.0
+        self.actor.attack_target = None
+        self.actor.attack_until = 0.0
