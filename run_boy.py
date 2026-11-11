@@ -11,6 +11,6 @@ py313 = r"C:\Users\user\AppData\Local\Programs\Python\Python313\python.exe"
 if os.path.exists(py313):
     cmd = [py313, "main.py"]
 else:
-    cmd = ["py", "-3.13", "boy_game.py"]
+    cmd = ["py", "-3.13", "main.py"]
 
 sys.exit(subprocess.call(cmd))
