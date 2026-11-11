@@ -43,3 +43,6 @@ class Inventory:
             self.remove(material, count)
         self.add(item)
         return True
+
+    def unassigned_items(self):
+        pass
