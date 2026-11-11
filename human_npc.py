@@ -211,4 +211,9 @@ class HumanNPC:
         self.actor.next_route_at = 0.0
 
     def return_to_origin(self, world, dt):
-        pass
+        if world.resource_time < self.gather_until:
+            return
+        actor = self.actor
+        actor.follow_route(world, self.destination, dt, 0, speed=215)
+        if hypot(actor.x - self.destination[0], actor.y - self.destination[1]) < 0.01:
+            self.set_command(world, "wait")
