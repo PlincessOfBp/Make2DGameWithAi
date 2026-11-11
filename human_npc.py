@@ -62,8 +62,8 @@ class HumanNPC:
 
     def protect(self, world, dt):
         actor = self.actor
-        actor.walk_time = 0.0
         if actor.health > 15:
+            actor.walk_time = 0.0
             return
         threat = min((npc for npc in world.zombies if npc.state == "zombie"),
                      key=lambda npc: hypot(npc.x - actor.x, npc.y - actor.y), default=None)
