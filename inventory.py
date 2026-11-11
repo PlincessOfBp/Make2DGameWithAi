@@ -55,3 +55,6 @@ class Inventory:
 
     def selected_item(self):
         return None if self.selected is None else self.slots[self.selected]
+
+    def select(self, slot):
+        pass
