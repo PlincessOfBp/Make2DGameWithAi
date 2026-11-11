@@ -49,4 +49,12 @@ class PlayMode:
 
 
     def draw_buildings(self):
-        pass
+        cam_x, cam_y = self.camera
+        for kind, x, y, width, height, footprint in self.world.buildings:
+            image = self.images[f"world/buildings/{kind}_roof.png"]
+            if image is not None:
+                image.draw(x - cam_x, y - cam_y)
+            else:
+                for left, bottom, right, top in footprint:
+                    p.draw_rectangle(left - cam_x, bottom - cam_y, right - cam_x, top - cam_y,
+                                     100, 80, 68, filled=True)
