@@ -271,9 +271,8 @@ class PlayMode:
         player = self.player
         if player.health == 0 or player.action == "bite":
             return
-        inventory = player.inventory
         attacking = player.action == "attack"
-        item = player.action_weapon if attacking else inventory.slots[inventory.selected]
+        item = player.action_weapon if attacking else player.inventory.selected_item()
         image = self.images["items/weapons.png"]
         if item not in WEAPON_COLUMNS or image is None:
             return
