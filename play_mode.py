@@ -63,13 +63,16 @@ class PlayMode:
                     self.ui.dragged_item = None
                     self.ui.page = "inventory" if self.ui.page is None else None
                 elif (self.ui.page is None and self.ui.ally is None
-                      and event.key in (p.SDLK_e, p.SDLK_b)):
+                      and event.key in (p.SDLK_e, p.SDLK_b, p.SDLK_q)):
                     cam_x, cam_y = self.camera
                     target = ((self.player.x, self.player.y) if self.mouse is None
                               else (self.mouse[0] + cam_x, self.mouse[1] + cam_y))
                     if event.key == p.SDLK_e:
                         self.player.aim(*target, dt=0)
                         self.player.use_selected(self.world)
+                    elif event.key == p.SDLK_q:
+                        self.player.aim(*target, dt=0)
+                        self.player.drop_selected(self.world)
                     else:
                         self.player.start_action("bite", *target)
             elif event.type == p.SDL_MOUSEBUTTONUP:
