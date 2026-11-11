@@ -14,6 +14,8 @@ NPC_ATTACK_INTERVAL = 2
 
 
 class Zombie:
+    RADIUS = CHASE_RADIUS
+
     def __init__(self, entity_id, x, y):
         self.entity_id = entity_id
         self.x, self.y = x, y
