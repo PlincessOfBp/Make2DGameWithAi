@@ -9,6 +9,12 @@ from item_data import ITEM_ICON_CELLS, ITEM_NAMES, RECIPES
 HOTBAR_X, HOTBAR_TOP = 259, 68
 INVENTORY_X, INVENTORY_TOP = 225, 439
 CRAFT_X, CRAFT_TOP = 180, 450
+ALLY_COMMANDS = (
+    ("wait", "대기"), ("follow", "따라가기"), ("attack", "공동 공격"), ("gather", "채집"),
+)
+GATHER_COMMANDS = (("wood", "나무"), ("stone", "돌멩이"), ("back", "뒤로"))
+ALLY_LEFT, ALLY_TOP = 240, 412
+
 UI_ASSETS = (
     "quickbar", "slot_selected", "inventory", "crafting", "panel", "health", "infection",
 )
