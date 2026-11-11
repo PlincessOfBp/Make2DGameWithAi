@@ -237,3 +237,6 @@ class PlayerUI:
             top = HOTBAR_TOP - 8
             p.draw_rectangle(left, top - 48, left + 48, top, 247, 210, 127)
         self.icon(images, self.dragged_item, x, y, player.inventory.items[self.dragged_item])
+
+    def ally_buttons(self):
+        pass
