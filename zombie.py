@@ -60,4 +60,5 @@ class Zombie:
                 self.walk_time = 0.0
 
     def set_command(self, world, command):
-        pass
+        self.command_target = world.attack_target if command == "attack" else None
+        self.command = command
