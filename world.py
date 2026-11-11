@@ -230,3 +230,6 @@ class World:
         self.tree_respawns[position] = self.resource_time + TREE_RESPAWN_SECONDS
         player.inventory.add("wood")
         return True
+
+    def ally_at(self, player, x, y):
+        pass
