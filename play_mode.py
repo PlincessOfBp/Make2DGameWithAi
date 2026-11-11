@@ -48,7 +48,12 @@ class PlayMode:
 
     def handle_events(self, events):
         for event in events:
-            if event.type == p.SDL_KEYUP:
+            if event.type == p.SDL_KEYDOWN and event.key == p.SDLK_ESCAPE:
+                if self.ui.page is None:
+                    return True
+                self.ui.page = None
+                self.ui.dragged_item = None
+            elif event.type == p.SDL_KEYUP:
                 self.keys.discard(event.key)
             elif event.type == p.SDL_MOUSEMOTION:
                 self.mouse = (event.x, SCREEN_HEIGHT - 1 - event.y)
@@ -98,6 +103,7 @@ class PlayMode:
                     item = self.world.collect_pickup(self.player.x, self.player.y, *target)
                     if item is not None:
                         self.player.inventory.add(item)
+        return False
 
     def update(self, dt):
         if self.ui.page is not None or self.ui.result is not None:

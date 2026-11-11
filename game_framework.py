@@ -17,11 +17,8 @@ class GameFramework:
                 dt = now - previous
                 previous = now
                 events = p.get_events()
-                if any(event.type == p.SDL_QUIT or
-                       (event.type == p.SDL_KEYDOWN and event.key == p.SDLK_ESCAPE)
-                       for event in events):
+                if any(event.type == p.SDL_QUIT for event in events) or mode.handle_events(events):
                     break
-                mode.handle_events(events)
                 mode.update(dt)
                 p.clear_canvas()
                 mode.draw()
