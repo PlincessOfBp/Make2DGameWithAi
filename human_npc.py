@@ -219,4 +219,9 @@ class HumanNPC:
             self.set_command(world, "wait")
 
     def fight(self, world, target, dt):
-        pass
+        actor = self.actor
+        if (hypot(target.x - actor.x, target.y - actor.y) <= 31
+                and world.pickup_path_clear(actor.x, actor.y, target.x, target.y)):
+            actor.start_attack(target, world.resource_time)
+        else:
+            actor.follow_route(world, (target.x, target.y), dt, 27, speed=215)
