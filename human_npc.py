@@ -38,6 +38,10 @@ class HumanNPC:
     def flee(self, world, dt):
         actor = self.actor
         if self.destination is None:
+            if world.resource_time < self.escape_retry_at:
+                actor.walk_time = 0.0
+                return
+            self.escape_retry_at = world.resource_time + 0.4
             x, y = actor.x, actor.y
             edges = ((8, y), (MAP_WIDTH - 8, y), (x, 8), (x, MAP_HEIGHT - 8))
             for goal in sorted(edges, key=lambda point: hypot(point[0] - x, point[1] - y)):
