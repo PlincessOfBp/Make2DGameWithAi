@@ -219,4 +219,15 @@ class World:
                     )
 
     def hit_zombie(self, zombie, damage):
-        pass
+        if zombie.state != "zombie":
+            return
+        zombie.health = max(0, zombie.health - damage)
+        if zombie.health:
+            return
+        zombie.state = "dead"
+        zombie.purify_at = None
+        if self.random.random() < 0.35:
+            item = self.random.choice(("axe", "knife", "canned_food"))
+            self.pickups[f"zombie:{zombie.entity_id}"] = (
+                item, zombie.x, zombie.y, self.building_at(zombie.x, zombie.y),
+            )
