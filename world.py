@@ -113,4 +113,20 @@ class World:
         return True
 
     def collect_pickup(self, x, y, mouse_x, mouse_y):
-        pass
+
+        candidates = (
+            (hypot(mouse_x - px, mouse_y - py), pickup_id)
+            for pickup_id, _, px, py in self.visible_pickups(x, y)
+            if abs(mouse_x - px) <= PICKUP_ICON_HALF_SIZE
+            and abs(mouse_y - py) <= PICKUP_ICON_HALF_SIZE
+            and hypot(x - px, y - py) <= PICKUP_REACH
+            and self.pickup_path_clear(x, y, px, py)
+        )
+        nearest = min(candidates, default=None)
+        if nearest is None:
+            return None
+        _, pickup_id = nearest
+        pickup = self.pickups.pop(pickup_id)
+        if pickup[0] == "stone":
+            self.stone_respawns[pickup_id] = (self.resource_time + STONE_RESPAWN_SECONDS, pickup)
+        return pickup[0]
