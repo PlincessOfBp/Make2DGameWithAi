@@ -79,4 +79,11 @@ class PlayerUI:
             image.draw(x + width // 2, top - height // 2)
 
     def icon(self, images, item, x, y, count=None):
-        pass
+        image = images["items/items.png"]
+        if image is not None:
+            sx, sy = ITEM_ICON_CELLS[item]
+            image.clip_draw(sx, sy, 32, 32, x, y)
+        else:
+            self.text(x - 15, y, ITEM_NAMES[item])
+        if count is not None:
+            self.text(x + 8, y - 12, str(count))
