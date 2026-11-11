@@ -23,3 +23,7 @@ class PlayMode:
                 self.images[path] = p.load_image(str(ASSETS / path))
             except OSError:
                 self.images[path] = None
+
+
+    def exit(self):
+        pass
