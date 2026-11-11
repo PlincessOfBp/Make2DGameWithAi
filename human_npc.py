@@ -292,11 +292,41 @@ class HumanNPC:
 
     def fight(self, world, target, dt):
         actor = self.actor
-        if (hypot(target.x - actor.x, target.y - actor.y) <= 31
-                and world.pickup_path_clear(actor.x, actor.y, target.x, target.y)):
+        distance = hypot(target.x - actor.x, target.y - actor.y)
+        if distance <= 31 and world.pickup_path_clear(actor.x, actor.y, target.x, target.y):
+            self.melee_route.clear()
             actor.start_attack(target, world.resource_time)
-        else:
+            return
+        if distance > 120:
+            self.melee_route.clear()
             actor.follow_route(world, (target.x, target.y), dt, 27, speed=215)
+            return
+
+        if self.melee_target != target.entity_id:
+            self.melee_target = target.entity_id
+            self.melee_route.clear()
+            self.melee_retry_at = 0.0
+        obstacles = world.collision_obstacles(actor)
+        start = (actor.x, actor.y)
+        if self.melee_route and not world.pickup_path_clear(
+            *start, *self.melee_route[0], actor.RADIUS, obstacles
+        ):
+            self.melee_route.clear()
+        moved = self.melee_target_position is None or hypot(
+            target.x - self.melee_target_position[0], target.y - self.melee_target_position[1]
+        ) > 12
+        now = world.resource_time
+        if (not self.melee_route or moved) and now >= self.melee_retry_at:
+            self.melee_route = self.plan_melee_route(world, target, obstacles)
+            self.melee_target_position = (target.x, target.y)
+            self.melee_retry_at = now + MELEE_REPLAN_SECONDS
+        if not self.melee_route:
+            actor.walk_time = 0.0
+            return
+        waypoint = self.melee_route[0]
+        actor.move_toward(world, *waypoint, dt, 215, 0, steer=False)
+        if hypot(actor.x - waypoint[0], actor.y - waypoint[1]) < 0.01:
+            self.melee_route.pop(0)
 
     def can_take_gathered(self):
         return self.command not in ("wood", "stone", "return") and bool(self.inventory.items)
