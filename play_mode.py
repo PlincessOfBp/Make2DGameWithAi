@@ -25,6 +25,11 @@ class PlayMode:
             "world/ground.png", "characters/player.png",
             "world/props/tree.png", "items/items.png",
         }
+        paths.update(f"ui/{name}.png" for name in UI_ASSETS)
+        paths.update(("items/weapons.png", "world/props/barricade.png", "ui/purifying.png"))
+        for zombie in self.world.zombies:
+            paths.add(f"characters/zombie_{zombie.variant:02}.png")
+            paths.add(f"characters/human_{zombie.variant:02}.png")
         for kind, x, y, *_ in self.world.buildings:
             paths.update(f"world/props/{name}.png" for name, _, _ in self.world.furniture[x, y])
             for layer in ("interior", "roof"):
