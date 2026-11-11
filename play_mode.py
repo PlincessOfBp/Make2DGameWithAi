@@ -68,7 +68,10 @@ class PlayMode:
     def draw_buildings(self):
         cam_x, cam_y = self.camera
         for kind, x, y, width, height, footprint in self.world.buildings:
-            image = self.images[f"world/buildings/{kind}_roof.png"]
+            indoors = any(left <= self.player.x <= right and bottom <= self.player.y <= top
+                          for left, bottom, right, top in footprint)
+            layer = "interior" if indoors else "roof"
+            image = self.images[f"world/buildings/{kind}_{layer}.png"]
             if image is not None:
                 image.draw(x - cam_x, y - cam_y)
             else:
