@@ -8,4 +8,6 @@ class Inventory:
         self.selected = 0
 
     def add(self, item):
-        pass
+        self.items[item] = self.items.get(item, 0) + 1
+        if item in HOTBAR_ITEMS and item not in self.slots and None in self.slots:
+            self.slots[self.slots.index(None)] = item
