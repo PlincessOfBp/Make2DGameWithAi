@@ -271,8 +271,11 @@ class World:
         del self.trees[position]
         self.walls.remove(self.tree_walls[position])
         self.tree_respawns[position] = self.resource_time + TREE_RESPAWN_SECONDS
-        x, y = position
-        self.pickups[f"drop:{next(self.drop_ids)}"] = ("wood", x, y, self.building_at(x, y))
+        if inventory is None:
+            x, y = position
+            self.pickups[f"drop:{next(self.drop_ids)}"] = ("wood", x, y, self.building_at(x, y))
+        else:
+            inventory.add("wood")
         return True
 
     def find_route(self, start, goal, radius):
