@@ -87,3 +87,6 @@ class PlayerUI:
             self.text(x - 15, y, ITEM_NAMES[item])
         if count is not None:
             self.text(x + 8, y - 12, str(count))
+
+    def draw_hud(self, images, player, remaining):
+        pass
