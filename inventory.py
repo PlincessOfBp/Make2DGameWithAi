@@ -6,3 +6,6 @@ class Inventory:
         self.items = {}
         self.slots = [None] * 5
         self.selected = 0
+
+    def add(self, item):
+        pass
