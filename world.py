@@ -108,7 +108,13 @@ class World:
     def pickup_path_clear(self, x, y, target_x, target_y, clearance=0):
 
         dx, dy = target_x - x, target_y - y
+        min_x, max_x = sorted((x, target_x))
+        min_y, max_y = sorted((y, target_y))
         for left, bottom, right, top in self.walls:
+            left, bottom = left - clearance, bottom - clearance
+            right, top = right + clearance, top + clearance
+            if max_x <= left or min_x >= right or max_y <= bottom or min_y >= top:
+                continue
             # Intersect the segment's parameter range with the rectangle on each axis.
             start, end = 0.0, 1.0
             for origin, delta, low, high in ((x, dx, left, right), (y, dy, bottom, top)):
