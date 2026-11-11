@@ -278,4 +278,47 @@ class World:
         return True
 
     def find_route(self, start, goal, radius):
-        pass
+        if self.pickup_path_clear(*start, *goal, radius):
+            return [goal]
+
+        # Wall corners make waypoints without snapping actors to a grid at narrow doors.
+        margin = radius + 1
+        min_x, max_x = sorted((start[0], goal[0]))
+        min_y, max_y = sorted((start[1], goal[1]))
+        corners = set()
+        for left, bottom, right, top in self.walls:
+            if right < min_x - 240 or left > max_x + 240 or top < min_y - 240 or bottom > max_y + 240:
+                continue
+            for x in (left - margin, right + margin):
+                for y in (bottom - margin, top + margin):
+                    if (radius <= x <= MAP_WIDTH - radius and radius <= y <= MAP_HEIGHT - radius
+                            and self.pickup_path_clear(x, y, x, y, radius)):
+                        corners.add((x, y))
+        candidates = sorted(corners | {goal})
+        estimate = {point: hypot(goal[0] - point[0], goal[1] - point[1]) for point in candidates}
+        frontier = [(hypot(goal[0] - start[0], goal[1] - start[1]), 0.0, start)]
+        distances = {start: 0.0}
+        parents = {}
+        visited = set()
+        while frontier:
+            _, distance, point = heappop(frontier)
+            if point in visited:
+                continue
+            if point == goal:
+                route = []
+                while point != start:
+                    route.append(point)
+                    point = parents[point]
+                return route[::-1]
+            visited.add(point)
+            for candidate in candidates:
+                if candidate in visited:
+                    continue
+                cost = distance + hypot(candidate[0] - point[0], candidate[1] - point[1])
+                if (cost >= distances.get(candidate, float("inf"))
+                        or not self.pickup_path_clear(*point, *candidate, radius)):
+                    continue
+                distances[candidate] = cost
+                parents[candidate] = point
+                heappush(frontier, (cost + estimate[candidate], cost, candidate))
+        return []
