@@ -79,6 +79,8 @@ class HumanNPC:
         x, y = max(candidates, key=lambda point: hypot(point[0] - threat.x, point[1] - threat.y))
         if hypot(x - threat.x, y - threat.y) > hypot(actor.x - threat.x, actor.y - threat.y):
             actor.move_toward(world, x, y, dt, 215, 0)
+        else:
+            actor.walk_time = 0.0
 
     def choose_resource(self, world, player):
         actor = self.actor
