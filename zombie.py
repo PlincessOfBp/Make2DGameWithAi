@@ -16,4 +16,13 @@ class Zombie:
         self.command = "wait"
 
     def move_toward(self, world, x, y, dt, speed, stop):
-        pass
+        dx, dy = x - self.x, y - self.y
+        distance = hypot(dx, dy)
+        if distance <= stop:
+            self.walk_time = 0.0
+            return
+        self.angle = atan2(dy, dx) - pi / 2
+        step = min(speed * dt, distance - stop) / distance
+        position = world.move(self.x, self.y, dx * step, dy * step, 8)
+        self.walk_time = self.walk_time + dt if position != (self.x, self.y) else 0.0
+        self.x, self.y = position
