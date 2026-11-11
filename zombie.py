@@ -37,6 +37,7 @@ class Zombie:
         self.route = []
         self.route_goal = None
         self.next_route_at = 0.0
+        self.avoid_side = -1 if entity_id % 2 else 1
 
     def move_toward(self, world, x, y, dt, speed, stop, steer=True):
         dx, dy = x - self.x, y - self.y
@@ -48,18 +49,20 @@ class Zombie:
         travel = min(speed * dt, distance - stop)
         step = travel / distance
         position = world.move(self.x, self.y, dx * step, dy * step, self.RADIUS, actor=self)
-        if steer and travel and hypot(position[0] - self.x, position[1] - self.y) < travel * 0.25:
-            # Keep the wall route, but try a short step around moving bodies.
-            side = -1 if self.entity_id % 2 else 1
-            candidates = [position]
-            for offset in (side * pi / 3, -side * pi / 3, side * pi / 2, -side * pi / 2):
-                angle = heading + offset
-                candidates.append(world.move(self.x, self.y, cos(angle) * travel, sin(angle) * travel,
-                                             self.RADIUS, actor=self))
-            position = max(candidates, key=lambda point: (
-                distance - hypot(x - point[0], y - point[1])
-                + hypot(point[0] - self.x, point[1] - self.y) * 0.25
-            ))
+        forward = ((position[0] - self.x) * dx + (position[1] - self.y) * dy) / distance
+        if steer and travel and forward < travel * 0.25:
+            wall_only = world.move(self.x, self.y, dx * step, dy * step, self.RADIUS)
+            if wall_only != position:
+                # Keep one side while passing the body instead of changing sides every frame.
+                for side in (self.avoid_side, -self.avoid_side):
+                    angle = heading + side * pi / 2
+                    candidate = world.move(self.x, self.y, cos(angle) * travel, sin(angle) * travel,
+                                           self.RADIUS, actor=self)
+                    lateral = ((candidate[1] - self.y) * dx - (candidate[0] - self.x) * dy) / distance
+                    if lateral * side > travel * 0.25:
+                        position = candidate
+                        self.avoid_side = side
+                        break
         moved = position != (self.x, self.y)
         self.angle = (atan2(position[1] - self.y, position[0] - self.x) if moved else heading) - pi / 2
         self.walk_time = self.walk_time + dt if moved else 0.0
