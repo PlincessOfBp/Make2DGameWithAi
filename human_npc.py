@@ -1,13 +1,14 @@
 from math import atan2, cos, hypot, pi, sin, tau
 
 from inventory import Inventory
-from item_data import TREE_DAMAGE
 from town import MAP_HEIGHT, MAP_WIDTH
 
 
 GATHER_FRAME_TIME = 0.15
 GATHER_REACH = 35
 GATHER_LIMIT = 20
+WOOD_GATHER_TOOL = "stone_axe"
+GATHER_ROUTE_TIMEOUT = 1.0
 ASSIST_RANGE = 220
 ASSIST_MEMORY = 5.0
 
@@ -26,6 +27,9 @@ class HumanNPC:
         self.following = False
         self.gather_remaining = 0
         self.gather_origin = None
+        self.gather_shortfall = 0
+        self.gather_blocked_at = None
+        self.skipped_resources = set()
 
     def set_command(self, world, command, amount=1):
         self.command = command
@@ -34,6 +38,9 @@ class HumanNPC:
         gathering = command in ("wood", "stone")
         self.gather_remaining = max(1, min(amount, GATHER_LIMIT)) if gathering else 0
         self.gather_origin = (self.actor.x, self.actor.y) if gathering else None
+        self.gather_shortfall = 0
+        self.gather_blocked_at = None
+        self.skipped_resources.clear()
         target = world.attack_target
         self.target = target.entity_id if command == "attack" and target is not None else None
         self.destination = None
@@ -94,17 +101,18 @@ class HumanNPC:
         else:
             actor.walk_time = 0.0
 
-    def choose_resource(self, world, player):
+    def choose_resource(self, world):
         actor = self.actor
         start = (actor.x, actor.y)
         if self.command == "wood":
-            self.tool = max((item for item in TREE_DAMAGE if player.items.get(item, 0)),
-                            key=TREE_DAMAGE.get, default=None)
-            points = [(position, *position) for position in world.trees] if self.tool else []
+            self.tool = WOOD_GATHER_TOOL
+            points = [(position, *position) for position in world.trees]
         else:
             points = [(pickup_id, x, y) for pickup_id, item, x, y in world.visible_pickups(*start)
                       if item == "stone"]
         for target, x, y in sorted(points, key=lambda entry: hypot(entry[1] - actor.x, entry[2] - actor.y)):
+            if target in self.skipped_resources:
+                continue
             angle = atan2(actor.y - y, actor.x - x)
             goals = [(x, y)] if self.command == "stone" else [
                 (x + cos(angle + turn * pi / 2) * 30, y + sin(angle + turn * pi / 2) * 30)
@@ -118,11 +126,12 @@ class HumanNPC:
                 route = world.find_route(start, goal, 8)
                 if route and world.pickup_path_clear(*goal, *goal, 8):
                     self.target, self.destination = target, goal
+                    self.gather_blocked_at = None
                     actor.route, actor.route_goal = route, goal
                     return True
         return False
 
-    def gather(self, world, player, dt):
+    def gather(self, world, dt):
         actor = self.actor
         now = world.resource_time
         wood = self.command == "wood"
@@ -131,12 +140,13 @@ class HumanNPC:
             return
 
         if self.target is not None and (
-            (wood and (self.target not in world.trees or self.tool not in player.items))
+            (wood and self.target not in world.trees)
             or (not wood and self.target not in world.pickups)
         ):
             self.target = None
             self.gather_pending = False
-        if self.target is None and not self.choose_resource(world, player):
+        if self.target is None and not self.choose_resource(world):
+            self.gather_shortfall = self.gather_remaining
             self.begin_return()
             return
         if wood:
@@ -169,6 +179,14 @@ class HumanNPC:
             actor.walk_time = 0.0
         elif not clear:
             actor.follow_route(world, self.destination, dt, 0, speed=200)
+            if actor.walk_time:
+                self.gather_blocked_at = None
+            elif dt > 0:
+                if self.gather_blocked_at is None:
+                    self.gather_blocked_at = now
+                elif now - self.gather_blocked_at >= GATHER_ROUTE_TIMEOUT:
+                    self.skipped_resources.add(self.target)
+                    self.target = None
         elif now >= actor.next_chop:
             actor.walk_time = 0.0
             actor.angle = atan2(y - actor.y, x - actor.x) - pi / 2
@@ -200,7 +218,7 @@ class HumanNPC:
             else:
                 self.fight(world, target, dt)
         elif self.command in ("wood", "stone"):
-            self.gather(world, player, dt)
+            self.gather(world, dt)
         elif self.command == "return":
             self.return_to_origin(world, dt)
         elif world.resource_time >= self.gather_until:
@@ -230,7 +248,9 @@ class HumanNPC:
         actor = self.actor
         actor.follow_route(world, self.destination, dt, 0, speed=215)
         if hypot(actor.x - self.destination[0], actor.y - self.destination[1]) < 0.01:
+            shortfall = self.gather_shortfall
             self.set_command(world, "wait")
+            self.gather_shortfall = shortfall
 
     def fight(self, world, target, dt):
         actor = self.actor
