@@ -125,7 +125,7 @@ class PlayMode:
                 actor.advance_attack(self.world, self.player)
         for zombie in self.world.zombies:
             zombie.update(self.world, self.player, dt)
-        if self.ui.ally is not None and self.ui.ally.state != "ally":
+        if self.ui.ally is not None and not self.world.can_command_ally(self.player, self.ui.ally):
             self.ui.ally = None
         if self.player.health == 0:
             self.ui.result = "게임 오버 · 사망"
