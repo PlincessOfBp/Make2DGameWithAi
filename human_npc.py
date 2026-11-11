@@ -208,7 +208,7 @@ class HumanNPC:
             self.protect(world, dt)
 
     def take_gathered(self, player):
-        if self.command in ("wood", "stone", "return") or not self.inventory.items:
+        if not self.can_take_gathered():
             return False
         for item, count in tuple(self.inventory.items.items()):
             player.inventory.add(item, count)
