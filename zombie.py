@@ -220,4 +220,23 @@ class Zombie:
             self.next_hit = now + NPC_ATTACK_INTERVAL
 
     def advance_attack(self, world, player):
-        pass
+        now = world.resource_time
+        target = self.attack_target
+        if target is not None and now >= self.attack_until - ATTACK_FRAME_TIME * 2 - 1e-9:
+            self.attack_target = None
+            valid = (target.state == "zombie" if self.state == "ally"
+                     else target is player or target.state in ("ally", "fleeing"))
+            if (valid and target.health > 0
+                    and hypot(target.x - self.x, target.y - self.y) <= ATTACK_REACH
+                    and world.pickup_path_clear(self.x, self.y, target.x, target.y)):
+                if target is player:
+                    player.take_damage(NPC_ATTACK_DAMAGE, now)
+                elif target.state == "zombie":
+                    world.hit_zombie(target, NPC_ATTACK_DAMAGE)
+                else:
+                    target.health = max(0, target.health - NPC_ATTACK_DAMAGE)
+                    if target.health == 0:
+                        target.state = "dead"
+                    else:
+                        target.hurt_until = now + 0.16
+        return now < self.attack_until
