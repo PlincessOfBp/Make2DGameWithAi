@@ -232,4 +232,8 @@ class World:
         return True
 
     def ally_at(self, player, x, y):
-        pass
+        candidates = [z for z in self.zombies if z.state == "ally"
+                      and hypot(z.x - x, z.y - y) <= 23
+                      and hypot(z.x - player.x, z.y - player.y) <= 90
+                      and self.pickup_path_clear(player.x, player.y, z.x, z.y)]
+        return min(candidates, key=lambda z: hypot(z.x - x, z.y - y), default=None)
