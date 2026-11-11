@@ -21,3 +21,6 @@ class Player:
         x, y = world.move(self.x, self.y, horizontal * distance, vertical * distance, self.RADIUS)
         self.walk_time = self.walk_time + dt if (x, y) != (self.x, self.y) else 0.0
         self.x, self.y = x, y
+
+    def aim(self, world_x, world_y, dt):
+        pass
