@@ -55,4 +55,20 @@ class HumanNPC:
             self.destination = None
 
     def protect(self, world, dt):
-        pass
+        actor = self.actor
+        actor.walk_time = 0.0
+        if actor.health > 15:
+            return
+        threat = min((npc for npc in world.zombies if npc.state == "zombie"),
+                     key=lambda npc: hypot(npc.x - actor.x, npc.y - actor.y), default=None)
+        if threat is None or hypot(threat.x - actor.x, threat.y - actor.y) >= 160:
+            return
+        heading = atan2(actor.y - threat.y, actor.x - threat.x)
+        candidates = [
+            world.move(actor.x, actor.y, cos(heading + turn * tau / 8) * 30,
+                       sin(heading + turn * tau / 8) * 30, 8)
+            for turn in range(8)
+        ]
+        x, y = max(candidates, key=lambda point: hypot(point[0] - threat.x, point[1] - threat.y))
+        if hypot(x - threat.x, y - threat.y) > hypot(actor.x - threat.x, actor.y - threat.y):
+            actor.move_toward(world, x, y, dt, 215, 0)
