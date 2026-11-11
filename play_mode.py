@@ -8,6 +8,8 @@ from item_data import ITEM_ICON_CELLS, TREE_MAX_HP, WEAPON_COLUMNS
 from player_ui import PlayerUI, UI_ASSETS
 from town import PICKUP_ICON_HALF_SIZE, SCREEN_HEIGHT, SCREEN_WIDTH, TREE_DRAW_OFFSET
 from world import World
+from human_npc import GATHER_FRAME_TIME
+from zombie import ATTACK_FRAME_TIME
 
 
 ASSETS = Path(__file__).resolve().parent / "assets"
