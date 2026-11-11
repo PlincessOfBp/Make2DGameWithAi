@@ -14,4 +14,7 @@ class World:
 
 
     def camera(self, x, y):
-        pass
+        return (
+            min(max(round(x) - SCREEN_WIDTH // 2, 0), MAP_WIDTH - SCREEN_WIDTH),
+            min(max(round(y) - SCREEN_HEIGHT // 2, 0), MAP_HEIGHT - SCREEN_HEIGHT),
+        )
