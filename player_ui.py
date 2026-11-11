@@ -141,11 +141,12 @@ class PlayerUI:
         if self.page == "inventory":
             self.panel(images, "inventory", INVENTORY_X, INVENTORY_TOP, 350, 258)
             self.text(241, 414, "인벤토리")
-            for index, item in enumerate(item for item in ITEM_NAMES if item in inventory.items):
+            for index, item in enumerate(inventory.unassigned_items()):
                 x = INVENTORY_X + 40 + index % 6 * 54
                 y = INVENTORY_TOP - 73 - index // 6 * 54
-                self.icon(images, item, x, y, inventory.items[item])
-            self.text(241, 211, "아이템 클릭  /  선택한 핫바에 배정")
+                if item != self.dragged_item:
+                    self.icon(images, item, x, y, inventory.items[item])
+            self.text(241, 211, "아이템을 드래그해 핫바 배정 또는 해제")
         else:
             self.panel(images, "crafting", CRAFT_X, CRAFT_TOP, 440, 280)
             self.text(202, 421, "제작")
