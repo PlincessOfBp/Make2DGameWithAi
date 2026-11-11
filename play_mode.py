@@ -63,6 +63,7 @@ class PlayMode:
         else:
             p.draw_rectangle(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, 91, 112, 75, filled=True)
         self.draw_buildings()
+        self.draw_player()
 
 
     def draw_buildings(self):
