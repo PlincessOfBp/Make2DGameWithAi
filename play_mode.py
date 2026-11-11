@@ -153,4 +153,34 @@ class PlayMode:
                 p.draw_rectangle(sx - 7, sy - 7, sx + 7, sy + 7, *color, filled=True)
 
     def draw_actors(self):
-        pass
+        cam_x, cam_y = self.camera
+        current_building = self.world.building_at(self.player.x, self.player.y)
+        for zombie in self.world.zombies:
+            if zombie.state == "escaped":
+                continue
+            building = self.world.building_at(zombie.x, zombie.y)
+            if building is not None and building != current_building:
+                continue
+            x, y = round(zombie.x) - cam_x, round(zombie.y) - cam_y
+            human = zombie.state in ("ally", "fleeing")
+            kind = "human" if human else "zombie"
+            image = self.images[f"characters/{kind}_{zombie.variant:02}.png"]
+            if image is not None:
+                row = 3 if zombie.state == "dead" else int(zombie.walk_time > 0)
+                frame = int(zombie.walk_time * 9) % 4 if row == 1 else 0
+                image.clip_composite_draw(frame * 64, (4 if human else 3) * 64 - row * 64,
+                                          64, 64, zombie.angle, "", x, y, 64, 64)
+            else:
+                p.draw_rectangle(x-8, y-8, x+8, y+8, 82, 154, 84, filled=True)
+            if zombie.purify_at is not None:
+                icon = self.images["ui/purifying.png"]
+                if icon is not None:
+                    icon.draw(x, y + 36)
+                self.ui.text(x + 13, y + 36, f"{max(0, zombie.purify_at - self.world.resource_time):.1f}")
+        barricade = self.images["world/props/barricade.png"]
+        for x, y in self.world.barricades:
+            x, y = x - cam_x, y - cam_y
+            if barricade is not None:
+                barricade.draw(x, y + 10)
+            else:
+                p.draw_rectangle(x-29, y-14, x+29, y+14, 118, 77, 46, filled=True)
