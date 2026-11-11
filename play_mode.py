@@ -139,12 +139,12 @@ class PlayMode:
         else:
             p.draw_rectangle(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, 91, 112, 75, filled=True)
         self.draw_buildings(interiors=True)
-        self.draw_pickups()
         self.draw_trees(foreground=False)
         self.draw_actors()
         self.draw_player()
         self.draw_weapon()
         self.draw_trees(foreground=True)
+        self.draw_pickups()
         self.draw_buildings(interiors=False)
         remaining = sum(z.state == "zombie" for z in self.world.zombies)
         self.ui.draw_hud(self.images, self.player, remaining)
