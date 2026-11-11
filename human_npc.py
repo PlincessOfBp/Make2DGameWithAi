@@ -210,9 +210,9 @@ class HumanNPC:
     def take_gathered(self, player):
         if self.command in ("wood", "stone", "return") or not self.inventory.items:
             return False
-        for item, count in self.inventory.items.items():
+        for item, count in tuple(self.inventory.items.items()):
             player.inventory.add(item, count)
-        self.inventory.items.clear()
+            self.inventory.remove(item, count)
         return True
 
     def begin_return(self):
