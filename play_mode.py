@@ -339,3 +339,6 @@ class PlayMode:
                 barricade.draw(x, y + 10)
             else:
                 p.draw_rectangle(x-29, y-14, x+29, y+14, 118, 77, 46, filled=True)
+
+    def draw_world_objects(self):
+        pass
