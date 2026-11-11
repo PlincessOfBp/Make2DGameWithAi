@@ -61,6 +61,7 @@ class World:
             for slot, (item, dx, dy) in enumerate(loot):
                 self.pickups[f"loot:{index}:{slot}"] = (item, x + dx, y + dy, index)
         self.stone_respawns = {}
+        self.drop_ids = count()
         self.resource_time = 0.0
 
     def camera(self, x, y):
