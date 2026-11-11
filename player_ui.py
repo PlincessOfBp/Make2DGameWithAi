@@ -204,4 +204,14 @@ class PlayerUI:
         return None
 
     def release(self, player, x, y, button):
-        pass
+        if button != p.SDL_BUTTON_LEFT:
+            return
+        item, self.dragged_item = self.dragged_item, None
+        if item is None or self.page != "inventory":
+            return
+        inventory = player.inventory
+        slot = self.hotbar_slot_at(x, y)
+        if slot is not None:
+            inventory.assign(item, slot)
+        elif INVENTORY_X <= x < INVENTORY_X + 350 and INVENTORY_TOP - 258 < y <= INVENTORY_TOP:
+            inventory.unassign(item)
