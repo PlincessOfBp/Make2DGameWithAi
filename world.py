@@ -1,15 +1,24 @@
-from town import BUILDING_LAYOUTS, BUILDINGS, MAP_HEIGHT, MAP_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH
+from town import BUILDING_LAYOUTS, BUILDINGS, FURNITURE, MAP_HEIGHT, MAP_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH
 
 
 class World:
     def __init__(self):
         self.buildings = []
         self.walls = []
+        self.furniture = {}
         for kind, x, y in BUILDINGS:
             (width, height), rooms, walls = BUILDING_LAYOUTS[kind]
             left, bottom = x - width // 2, y - height // 2
             footprint = tuple((left+a, bottom+b, left+c, bottom+d) for a, b, c, d in rooms)
+            furniture = tuple((name, left + px, bottom + py)
+                              for name, px, py, _, _ in FURNITURE[kind])
             self.buildings.append((kind, x, y, width, height, footprint))
+            self.furniture[x, y] = furniture
+            for _, px, py, prop_width, prop_height in FURNITURE[kind]:
+                cx, cy = left + px, bottom + py
+                half_width, half_height = prop_width / 2, prop_height / 2
+                self.walls.append((cx - half_width, cy - half_height,
+                                   cx + half_width, cy + half_height))
             self.walls.extend((left+a, bottom+b, left+c, bottom+d) for a, b, c, d in walls)
 
 
