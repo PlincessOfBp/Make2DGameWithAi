@@ -138,7 +138,7 @@ class Zombie:
             self.set_command(world, "wait")
         self.walk_time = 0.0
 
-    def follow_route(self, world, goal, dt, stop):
+    def follow_route(self, world, goal, dt, stop, speed=None):
         start = (self.x, self.y)
         if world.pickup_path_clear(*start, *goal, CHASE_RADIUS):
             self.route.clear()
