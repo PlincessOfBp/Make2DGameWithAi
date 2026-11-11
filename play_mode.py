@@ -34,7 +34,13 @@ class PlayMode:
 
 
     def handle_events(self, events):
-        pass
+        for event in events:
+            if event.type == p.SDL_KEYDOWN:
+                self.keys.add(event.key)
+            elif event.type == p.SDL_KEYUP:
+                self.keys.discard(event.key)
+            elif event.type == p.SDL_MOUSEMOTION:
+                self.mouse = (event.x, SCREEN_HEIGHT - 1 - event.y)
 
 
     def update(self, dt):
