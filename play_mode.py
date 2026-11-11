@@ -341,4 +341,24 @@ class PlayMode:
                 p.draw_rectangle(x-29, y-14, x+29, y+14, 118, 77, 46, filled=True)
 
     def draw_world_objects(self):
-        pass
+        player = self.player
+        current_building = self.world.building_at(player.x, player.y)
+        draw_order = []
+        for zombie in self.world.zombies:
+            if zombie.state == "escaped":
+                continue
+            building = self.world.building_at(zombie.x, zombie.y)
+            if building is not None and building != current_building:
+                continue
+            if zombie.state == "dead":
+                self.draw_npc(zombie)
+            else:
+                draw_order.append((zombie.y, self.draw_npc, (zombie,)))
+
+        self.draw_barricades()
+        self.draw_pickups()
+        draw_order.extend(((player.y, self.draw_player, ()), (player.y, self.draw_weapon, ())))
+        draw_order.extend((y, self.draw_tree, (x, y, hp)) for (x, y), hp in self.world.trees.items())
+        # World Y increases away from the viewer; the trunk anchors each tree's depth.
+        for _, draw, args in sorted(draw_order, key=lambda entry: entry[0], reverse=True):
+            draw(*args)
