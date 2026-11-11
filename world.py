@@ -130,3 +130,6 @@ class World:
         if pickup[0] == "stone":
             self.stone_respawns[pickup_id] = (self.resource_time + STONE_RESPAWN_SECONDS, pickup)
         return pickup[0]
+
+    def update_resources(self, dt, player_x, player_y):
+        pass
