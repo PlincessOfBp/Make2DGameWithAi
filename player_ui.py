@@ -114,4 +114,41 @@ class PlayerUI:
             self.text(x - 20, y + 16, str(index + 1))
 
     def draw_window(self, images, player):
-        pass
+        if self.result is not None:
+            self.panel(images, "panel", 240, 412, 320, 224)
+            self.text(320, 320, self.result)
+            self.text(340, 270, "Esc로 종료")
+            return
+        if self.page is None:
+            return
+        inventory = player.inventory
+        for left, name, page in ((250, "인벤토리", "inventory"), (405, "제작", "craft")):
+            color = (111, 90, 53) if self.page == page else (58, 62, 64)
+            p.draw_rectangle(left, 450, left + 145, 477, *color, filled=True)
+            self.text(left + 28, 463, name)
+        if self.page == "inventory":
+            self.panel(images, "inventory", INVENTORY_X, INVENTORY_TOP, 350, 258)
+            self.text(241, 414, "인벤토리")
+            for index, item in enumerate(item for item in ITEM_NAMES if item in inventory.items):
+                x = INVENTORY_X + 40 + index % 6 * 54
+                y = INVENTORY_TOP - 73 - index // 6 * 54
+                self.icon(images, item, x, y, inventory.items[item])
+            self.text(241, 211, "아이템 클릭  /  선택한 핫바에 배정")
+        else:
+            self.panel(images, "crafting", CRAFT_X, CRAFT_TOP, 440, 280)
+            self.text(202, 421, "제작")
+            for index, item in enumerate(RECIPES):
+                y = CRAFT_TOP - 56 - index * 63
+                if item == self.recipe:
+                    p.draw_rectangle(CRAFT_X + 20, y - 56, CRAFT_X + 154, y, 205, 168, 96)
+                self.text(CRAFT_X + 27, y - 28, ITEM_NAMES[item])
+            self.icon(images, self.recipe, CRAFT_X + 207, CRAFT_TOP - 83)
+            for index, (item, count) in enumerate(RECIPES[self.recipe].items()):
+                owned = inventory.items.get(item, 0)
+                color = (248, 239, 218) if owned >= count else (255, 140, 130)
+                self.text(CRAFT_X + 193, CRAFT_TOP - 132 - index * 29,
+                          f"{ITEM_NAMES[item]}  {owned}/{count}", color)
+            enabled = inventory.can_craft(self.recipe)
+            p.draw_rectangle(CRAFT_X + 293, CRAFT_TOP - 251, CRAFT_X + 414, CRAFT_TOP - 222,
+                             *((111, 90, 53) if enabled else (60, 63, 65)), filled=True)
+            self.text(CRAFT_X + 326, CRAFT_TOP - 237, "제작" if enabled else "재료 부족")
