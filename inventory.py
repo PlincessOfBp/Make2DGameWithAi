@@ -28,3 +28,6 @@ class Inventory:
             previous = self.slots.index(item)
             self.slots[previous] = self.slots[self.selected]
         self.slots[self.selected] = item
+
+    def can_craft(self, item):
+        pass
