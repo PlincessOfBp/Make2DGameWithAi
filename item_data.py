@@ -15,4 +15,6 @@ RECIPES = {
 WEAPON_DAMAGE = {None: 5, "knife": 10, "stone_axe": 13, "nailed_bat": 17, "axe": 25}
 WEAPON_COLUMNS = {"knife": 0, "stone_axe": 1, "nailed_bat": 2, "axe": 3}
 WOOD_TOOLS = {"axe", "stone_axe"}
+TREE_MAX_HP = 60
+TREE_DAMAGE = {"axe": 30, "stone_axe": 20}
 HOTBAR_ITEMS = {*WEAPON_COLUMNS, "canned_food", "barricade"}
