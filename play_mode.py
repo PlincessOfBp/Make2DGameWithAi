@@ -290,4 +290,15 @@ class PlayMode:
                                   64, 64, angle + swing, "", x, y, 64, 64)
 
     def draw_tree(self, x, y, hp):
-        pass
+        cam_x, cam_y = self.camera
+        image = self.images["world/props/tree.png"]
+        sx, sy = x - cam_x, y - cam_y
+        if image is not None:
+            image.draw(sx, sy + TREE_DRAW_OFFSET)
+        else:
+            p.draw_rectangle(sx - 9, sy - 8, sx + 9, sy + 16, 105, 73, 40, filled=True)
+            p.draw_rectangle(sx - 40, sy + 16, sx + 40, sy + 80, 66, 105, 46, filled=True)
+        if hp < TREE_MAX_HP:
+            p.draw_rectangle(sx - 16, sy + 19, sx + 16, sy + 23, 55, 48, 42, filled=True)
+            width = round(32 * hp / TREE_MAX_HP)
+            p.draw_rectangle(sx - 16, sy + 19, sx - 16 + width, sy + 23, 222, 174, 79, filled=True)
