@@ -23,4 +23,8 @@ class Player:
         self.x, self.y = x, y
 
     def aim(self, world_x, world_y, dt):
-        pass
+        dx, dy = world_x - self.x, world_y - self.y
+        if dx or dy:
+            self.target_angle = atan2(dy, dx) - pi / 2
+        difference = (self.target_angle - self.angle + pi) % tau - pi
+        self.angle = (self.angle + difference * -expm1(-self.TURN_RESPONSE * dt)) % tau
