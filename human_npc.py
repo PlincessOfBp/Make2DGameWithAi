@@ -202,4 +202,10 @@ class HumanNPC:
         return True
 
     def begin_return(self):
-        pass
+        self.command = "return"
+        self.target = None
+        self.destination = self.gather_origin
+        self.gather_pending = False
+        self.actor.route.clear()
+        self.actor.route_goal = None
+        self.actor.next_route_at = 0.0
