@@ -63,3 +63,14 @@ FURNITURE = {
         ("checkout", 199, 43, 62, 35),
     ),
 }
+
+# Outdoor positions use world coordinates. Tree positions mark the trunks.
+TREE_TRUNKS = (
+    (70, 1595), (485, 1535), (1010, 1540), (440, 1320), (920, 1280),
+    (1340, 1575), (1860, 1490), (2340, 1460), (1460, 1265), (2190, 1280),
+    (110, 845), (550, 840), (1035, 830), (100, 220), (470, 150), (950, 220),
+    (1385, 490), (1550, 695), (1790, 810), (2170, 842), (2300, 350), (1960, 290),
+)
+TREE_TRUNK_HALF_WIDTH = 11
+TREE_TRUNK_HALF_HEIGHT = 8
+TREE_DRAW_OFFSET = 49
