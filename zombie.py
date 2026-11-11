@@ -3,6 +3,12 @@ from math import atan2, hypot, pi
 from item_data import TREE_DAMAGE
 
 
+SIGHT_RANGE = 280
+SIGHT_MEMORY = 5.0
+CHASE_RADIUS = 8
+ROUTE_RETRY = 0.4
+
+
 class Zombie:
     def __init__(self, entity_id, x, y):
         self.entity_id = entity_id
