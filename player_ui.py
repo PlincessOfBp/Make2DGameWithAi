@@ -29,6 +29,8 @@ class PlayerUI:
         self.result = None
         self.ally = None
         self.gather_menu = False
+        self.gather_resource = "wood"
+        self.gather_amount = 1
         self.dragged_item = None
 
     def load_font(self):
