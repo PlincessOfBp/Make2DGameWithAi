@@ -44,7 +44,6 @@ class PlayMode:
                 self.keys.discard(event.key)
             elif event.type == p.SDL_MOUSEMOTION:
                 self.mouse = (event.x, SCREEN_HEIGHT - 1 - event.y)
-
             elif event.type == p.SDL_MOUSEBUTTONDOWN and event.button == p.SDL_BUTTON_RIGHT:
                 cam_x, cam_y = self.camera
                 mouse_x, mouse_y = event.x + cam_x, SCREEN_HEIGHT - 1 - event.y + cam_y
@@ -80,9 +79,9 @@ class PlayMode:
 
     def draw_buildings(self, interiors):
         cam_x, cam_y = self.camera
-        for kind, x, y, width, height, footprint in self.world.buildings:
-            indoors = any(left <= self.player.x <= right and bottom <= self.player.y <= top
-                          for left, bottom, right, top in footprint)
+        current_building = self.world.building_at(self.player.x, self.player.y)
+        for index, (kind, x, y, width, height, footprint) in enumerate(self.world.buildings):
+            indoors = index == current_building
             if indoors != interiors:
                 continue
             layer = "interior" if indoors else "roof"
