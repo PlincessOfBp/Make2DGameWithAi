@@ -51,6 +51,8 @@ class HumanNPC:
         if command == "wait":
             self.wait_origin = (self.actor.x, self.actor.y)
         self.returning_to_wait = False
+        self.follow_escape_enemy = None
+        self.follow_retreat_goal = None
         self.melee_route.clear()
         self.melee_target = None
         self.melee_retry_at = 0.0
