@@ -132,4 +132,10 @@ class World:
         return pickup[0]
 
     def update_resources(self, dt, player_x, player_y):
-        pass
+
+        self.resource_time += dt
+        for pickup_id, (ready_at, pickup) in tuple(self.stone_respawns.items()):
+            _, x, y, _ = pickup
+            if self.resource_time >= ready_at and hypot(player_x - x, player_y - y) >= STONE_SPAWN_CLEARANCE:
+                self.pickups[pickup_id] = pickup
+                del self.stone_respawns[pickup_id]
