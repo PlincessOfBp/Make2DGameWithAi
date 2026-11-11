@@ -50,9 +50,10 @@ class PlayerUI:
             if left_click:
                 slot = self.hotbar_slot_at(x, y)
                 if slot is not None:
-                    inventory.selected = slot
-                    if self.page == "inventory":
+                    if self.page == "inventory" and inventory.slots[slot] is not None:
                         self.dragged_item = inventory.slots[slot]
+                    else:
+                        inventory.select(slot)
             return True
         if self.page is None:
             return False
@@ -216,7 +217,10 @@ class PlayerUI:
         inventory = player.inventory
         slot = self.hotbar_slot_at(x, y)
         if slot is not None:
-            inventory.assign(item, slot)
+            if inventory.slots[slot] == item:
+                inventory.select(slot)
+            else:
+                inventory.assign(item, slot)
         elif INVENTORY_X <= x < INVENTORY_X + 350 and INVENTORY_TOP - 258 < y <= INVENTORY_TOP:
             inventory.unassign(item)
 
