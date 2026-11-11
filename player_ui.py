@@ -22,4 +22,12 @@ class PlayerUI:
         self.result = None
 
     def load_font(self):
-        pass
+        windows = Path(environ.get("WINDIR", "C:/Windows")) / "Fonts"
+        for path in (windows / "malgun.ttf", "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+                     windows / "arial.ttf"):
+            if Path(path).is_file():
+                try:
+                    self.font = p.load_font(str(path), 15)
+                    return
+                except (OSError, ValueError):
+                    continue
