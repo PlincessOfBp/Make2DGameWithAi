@@ -27,8 +27,13 @@ class HumanNPC:
         self.gather_remaining = 0
         self.gather_origin = None
 
-    def set_command(self, world, command):
+    def set_command(self, world, command, amount=1):
         self.command = command
+        if command != "attack":
+            self.following = command == "follow"
+        gathering = command in ("wood", "stone")
+        self.gather_remaining = max(1, min(amount, GATHER_LIMIT)) if gathering else 0
+        self.gather_origin = (self.actor.x, self.actor.y) if gathering else None
         target = world.attack_target
         self.target = target.entity_id if command == "attack" and target is not None else None
         self.destination = None
