@@ -56,6 +56,7 @@ class PlayMode:
         horizontal = (p.SDLK_d in self.keys) - (p.SDLK_a in self.keys)
         vertical = (p.SDLK_w in self.keys) - (p.SDLK_s in self.keys)
         self.player.move(self.world, horizontal, vertical, dt)
+        self.world.update_resources(dt, self.player.x, self.player.y)
         self.camera = self.world.camera(self.player.x, self.player.y)
         if self.mouse is not None:
             mouse_x, mouse_y = self.mouse
