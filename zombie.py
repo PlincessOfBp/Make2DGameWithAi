@@ -27,6 +27,11 @@ class Zombie:
         self.attack_until = 0.0
         self.hurt_until = 0.0
         self.human = False
+        self.last_seen = None
+        self.seen_until = 0.0
+        self.route = []
+        self.route_goal = None
+        self.next_route_at = 0.0
 
     def move_toward(self, world, x, y, dt, speed, stop):
         dx, dy = x - self.x, y - self.y
