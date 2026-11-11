@@ -162,4 +162,23 @@ class PlayerUI:
             self.text(CRAFT_X + 326, CRAFT_TOP - 237, "제작" if enabled else "재료 부족")
 
     def click_ally(self, world, x, y, button):
-        pass
+        if self.ally is None:
+            return False
+        if self.ally.state != "ally":
+            self.ally = None
+            return True
+        if button != p.SDL_BUTTON_LEFT:
+            self.ally = None
+            return True
+        options = GATHER_COMMANDS if self.gather_menu else ALLY_COMMANDS
+        offset = ALLY_TOP - 52 - y
+        if ALLY_LEFT + 26 <= x < ALLY_LEFT + 294 and 0 <= offset < len(options) * 34 and offset % 34 < 28:
+            command, _ = options[offset // 34]
+            if command in ("gather", "back"):
+                self.gather_menu = command == "gather"
+            else:
+                self.ally.set_command(world, command)
+                self.ally = None
+        elif not (ALLY_LEFT <= x < ALLY_LEFT + 320 and ALLY_TOP - 224 < y <= ALLY_TOP):
+            self.ally = None
+        return True
