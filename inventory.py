@@ -46,3 +46,6 @@ class Inventory:
 
     def unassigned_items(self):
         return [item for item in self.items if item not in self.slots]
+
+    def unassign(self, item):
+        pass
