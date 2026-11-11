@@ -212,4 +212,9 @@ class Zombie:
             self.walk_time = 0.0
 
     def start_attack(self, target, now):
-        pass
+        self.walk_time = 0.0
+        self.angle = atan2(target.y - self.y, target.x - self.x) - pi / 2
+        if now >= self.next_hit:
+            self.attack_target = target
+            self.attack_until = now + ATTACK_FRAME_TIME * 3
+            self.next_hit = now + NPC_ATTACK_INTERVAL
