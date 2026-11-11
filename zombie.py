@@ -183,3 +183,6 @@ class Zombie:
         self.move_toward(world, *waypoint, dt, self.speed, 0)
         if hypot(self.x - waypoint[0], self.y - waypoint[1]) < 0.01:
             self.route.pop(0)
+
+    def see_target(self, world, player):
+        pass
