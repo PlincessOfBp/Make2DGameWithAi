@@ -383,3 +383,6 @@ class HumanNPC:
             if route and length <= hypot(target.x - actor.x, target.y - actor.y) + 96:
                 return route
         return []
+
+    def follow_escape(self, world, player, nearest):
+        pass
