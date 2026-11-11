@@ -93,6 +93,16 @@ class PlayMode:
             mouse_x, mouse_y = self.mouse
             cam_x, cam_y = self.camera
             self.player.aim(mouse_x + cam_x, mouse_y + cam_y, dt)
+        self.player.update_action(self.world, dt)
+        for zombie in self.world.zombies:
+            zombie.update(self.world, self.player, dt)
+        if self.player.health == 0:
+            self.ui.result = "게임 오버 · 사망"
+        elif self.player.infection >= 100:
+            self.ui.result = "게임 오버 · 좀비화"
+        elif all(z.state != "zombie" for z in self.world.zombies):
+            survivors = sum(z.state in ("ally", "fleeing", "escaped") for z in self.world.zombies)
+            self.ui.result = "해피 엔딩" if survivors * 2 > len(self.world.zombies) else "새드 엔딩"
 
     def draw(self):
         cam_x, cam_y = self.camera
