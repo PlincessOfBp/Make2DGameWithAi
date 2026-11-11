@@ -385,4 +385,44 @@ class HumanNPC:
         return []
 
     def follow_escape(self, world, player, nearest):
-        pass
+        actor = self.actor
+        enemy = self.follow_escape_enemy
+        now = world.resource_time
+        if nearest is not None and (
+            enemy is None or enemy.state != "zombie"
+            or nearest[0] + 24 < hypot(enemy.x - actor.x, enemy.y - actor.y)
+        ):
+            enemy = nearest[2]
+            self.follow_escape_enemy = enemy
+            self.follow_retreat_goal = None
+            self.follow_escape_seen_at = now
+        if enemy is None or enemy.state != "zombie":
+            self.follow_escape_enemy = None
+            self.follow_retreat_goal = None
+            return nearest, False
+        if not world.pickup_path_clear(actor.x, actor.y, enemy.x, enemy.y):
+            if nearest is not None and nearest[2] is not enemy:
+                self.follow_escape_enemy = nearest[2]
+                self.follow_retreat_goal = None
+                self.follow_escape_seen_at = now
+                return nearest, False
+            if now - self.follow_escape_seen_at < FOLLOW_LOST_SIGHT_DELAY:
+                return None, True
+            self.follow_escape_enemy = None
+            self.follow_retreat_goal = None
+            return nearest, False
+
+        self.follow_escape_seen_at = now
+        distance = hypot(actor.x - enemy.x, actor.y - enemy.y)
+        if distance < FOLLOW_RETREAT_DISTANCE:
+            return (distance, enemy.entity_id, enemy), False
+
+        self.follow_retreat_goal = None
+        dx, dy = player.x - actor.x, player.y - actor.y
+        length_sq = dx * dx + dy * dy
+        along = ((enemy.x - actor.x) * dx + (enemy.y - actor.y) * dy) / length_sq if length_sq else 0
+        along = max(0.0, min(1.0, along))
+        if hypot(actor.x + dx * along - enemy.x, actor.y + dy * along - enemy.y) < FOLLOW_RESUME_CLEARANCE:
+            return None, True
+        self.follow_escape_enemy = None
+        return nearest, False
