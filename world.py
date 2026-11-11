@@ -159,7 +159,9 @@ class World:
             )
             overlaps_wall = any(left < r and right > l and bottom < t and top > b
                                 for l, b, r, t in self.walls)
-            if self.resource_time >= ready_at and not occupied and not overlaps_wall:
+            pickup_in_trunk = any(left <= px <= right and bottom <= py <= top
+                                  for _, px, py, _ in self.pickups.values())
+            if self.resource_time >= ready_at and not occupied and not overlaps_wall and not pickup_in_trunk:
                 self.trees[x, y] = TREE_MAX_HP
                 self.walls.append(wall)
                 del self.tree_respawns[x, y]
@@ -223,15 +225,6 @@ class World:
             self.pickups[f"zombie:{zombie.entity_id}"] = (
                 item, zombie.x, zombie.y, self.building_at(zombie.x, zombie.y),
             )
-
-    def harvest_tree(self, player, position):
-        if position not in self.trees:
-            return False
-        del self.trees[position]
-        self.walls.remove(self.tree_walls[position])
-        self.tree_respawns[position] = self.resource_time + TREE_RESPAWN_SECONDS
-        player.inventory.add("wood")
-        return True
 
     def ally_at(self, player, x, y):
         candidates = [z for z in self.zombies if z.state == "ally"
