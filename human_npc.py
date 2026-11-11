@@ -74,4 +74,31 @@ class HumanNPC:
             actor.move_toward(world, x, y, dt, 215, 0)
 
     def choose_resource(self, world, player):
-        pass
+        actor = self.actor
+        start = (actor.x, actor.y)
+        if self.command == "wood":
+            self.tool = max((item for item in TREE_DAMAGE if player.items.get(item, 0)),
+                            key=TREE_DAMAGE.get, default=None)
+            points = [(position, *position) for position in world.trees] if self.tool else []
+        else:
+            points = [(pickup_id, x, y) for pickup_id, item, x, y in world.visible_pickups(*start)
+                      if item == "stone"]
+        for target, x, y in sorted(points, key=lambda entry: hypot(entry[1] - actor.x, entry[2] - actor.y)):
+            if hypot(x - actor.x, y - actor.y) > GATHER_RANGE:
+                break
+            angle = atan2(actor.y - y, actor.x - x)
+            goals = [(x, y)] if self.command == "stone" else [
+                (x + cos(angle + turn * pi / 2) * 30, y + sin(angle + turn * pi / 2) * 30)
+                for turn in range(4)
+            ]
+            for goal in goals:
+                if self.command == "wood" and not world.pickup_path_clear(
+                    *goal, (goal[0] + x) / 2, (goal[1] + y) / 2
+                ):
+                    continue
+                route = world.find_route(start, goal, 8)
+                if route and world.pickup_path_clear(*goal, *goal, 8):
+                    self.target, self.destination = target, goal
+                    actor.route, actor.route_goal = route, goal
+                    return True
+        return False
