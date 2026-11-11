@@ -22,6 +22,10 @@ class HumanNPC:
         self.gather_until = 0.0
         self.gather_pending = False
         self.tool = None
+        self.inventory = Inventory()
+        self.following = False
+        self.gather_remaining = 0
+        self.gather_origin = None
 
     def set_command(self, world, command):
         self.command = command
