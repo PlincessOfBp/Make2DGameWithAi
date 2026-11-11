@@ -50,3 +50,6 @@ class Player:
         self.action = action
         self.action_elapsed = 0.0
         return True
+
+    def update_action(self, world, dt):
+        pass
