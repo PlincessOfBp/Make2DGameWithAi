@@ -163,3 +163,6 @@ class World:
         self.walls.append((left, bottom, right, top))
         self.barricades.append((x, y))
         return True
+
+    def resolve_player_action(self, player, action, angle, weapon):
+        pass
