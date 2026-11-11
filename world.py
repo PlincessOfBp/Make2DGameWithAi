@@ -92,3 +92,6 @@ class World:
         for pickup_id, (item, px, py, location) in self.pickups.items():
             if location is None or location == building:
                 yield pickup_id, item, px, py
+
+    def pickup_path_clear(self, x, y, target_x, target_y):
+        pass
