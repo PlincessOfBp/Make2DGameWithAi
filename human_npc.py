@@ -272,7 +272,7 @@ class HumanNPC:
             self.gather_until = 0.0
         elif self.command == "follow":
             target = world.attack_target
-            if (target is not None and target.state == "zombie"
+            if (actor.health > 15 and target is not None and target.state == "zombie"
                     and world.resource_time - world.attack_target_at <= ASSIST_MEMORY
                     and hypot(actor.x - player.x, actor.y - player.y) <= ASSIST_RANGE
                     and hypot(target.x - player.x, target.y - player.y) <= ASSIST_RANGE):
