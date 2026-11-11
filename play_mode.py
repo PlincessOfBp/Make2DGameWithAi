@@ -74,7 +74,7 @@ class PlayMode:
             layer = "interior" if indoors else "roof"
             image = self.images[f"world/buildings/{kind}_{layer}.png"]
             if image is not None:
-                image.draw(x - cam_x, y - cam_y)
+                image.draw(x - cam_x, y - cam_y, width, height)
             else:
                 for left, bottom, right, top in footprint:
                     p.draw_rectangle(left - cam_x, bottom - cam_y, right - cam_x, top - cam_y,

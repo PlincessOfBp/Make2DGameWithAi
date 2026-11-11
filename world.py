@@ -1,4 +1,7 @@
-from town import BUILDING_LAYOUTS, BUILDINGS, FURNITURE, MAP_HEIGHT, MAP_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH
+from town import (
+    BUILDING_LAYOUTS, BUILDING_SCALES, BUILDINGS, FURNITURE,
+    MAP_HEIGHT, MAP_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH,
+)
 
 
 class World:
@@ -7,19 +10,26 @@ class World:
         self.walls = []
         self.furniture = {}
         for kind, x, y in BUILDINGS:
-            (width, height), rooms, walls = BUILDING_LAYOUTS[kind]
+            (image_width, image_height), rooms, walls = BUILDING_LAYOUTS[kind]
+            scale = BUILDING_SCALES.get(kind, 1)
+            width, height = round(image_width * scale), round(image_height * scale)
             left, bottom = x - width // 2, y - height // 2
-            footprint = tuple((left+a, bottom+b, left+c, bottom+d) for a, b, c, d in rooms)
-            furniture = tuple((name, left + px, bottom + py)
-                              for name, px, py, _, _ in FURNITURE[kind])
+            footprint = tuple(
+                (left + a * scale, bottom + b * scale, left + c * scale, bottom + d * scale)
+                for a, b, c, d in rooms
+            )
             self.buildings.append((kind, x, y, width, height, footprint))
-            self.furniture[x, y] = furniture
-            for _, px, py, prop_width, prop_height in FURNITURE[kind]:
-                cx, cy = left + px, bottom + py
+            self.furniture[x, y] = []
+            for name, px, py, prop_width, prop_height in FURNITURE[kind]:
+                cx, cy = left + round(px * scale), bottom + round(py * scale)
+                self.furniture[x, y].append((name, cx, cy))
                 half_width, half_height = prop_width / 2, prop_height / 2
                 self.walls.append((cx - half_width, cy - half_height,
                                    cx + half_width, cy + half_height))
-            self.walls.extend((left+a, bottom+b, left+c, bottom+d) for a, b, c, d in walls)
+            self.walls.extend(
+                (left + a * scale, bottom + b * scale, left + c * scale, bottom + d * scale)
+                for a, b, c, d in walls
+            )
 
 
     def camera(self, x, y):

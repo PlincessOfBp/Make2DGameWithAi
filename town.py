@@ -34,6 +34,12 @@ BUILDING_LAYOUTS = {
     ),
 }
 
+# Houses use larger footprints to fill their lots.
+BUILDING_SCALES = {
+    "house_small": 1.625,
+    "house_corner": 1.5,
+}
+
 # Type and world-space center, aligned with the eight lots in ground.png.
 BUILDINGS = (
     ("house_small", 250, 1500),
