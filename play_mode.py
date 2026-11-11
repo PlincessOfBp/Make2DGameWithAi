@@ -82,6 +82,8 @@ class PlayMode:
                         self.player.inventory.add(item)
 
     def update(self, dt):
+        if self.ui.page is not None or self.ui.result is not None:
+            return
         horizontal = (p.SDLK_d in self.keys) - (p.SDLK_a in self.keys)
         vertical = (p.SDLK_w in self.keys) - (p.SDLK_s in self.keys)
         self.player.move(self.world, horizontal, vertical, dt)
