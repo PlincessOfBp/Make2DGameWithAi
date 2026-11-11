@@ -76,3 +76,6 @@ class Player:
             return False
         self.inventory.remove(item)
         return True
+
+    def drop_selected(self, world):
+        pass
