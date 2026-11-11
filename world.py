@@ -25,6 +25,7 @@ class World:
         self.walls = list(self.tree_walls.values())
         self.tree_respawns = {}
         self.barricades = []
+        self.attack_target = None
         self.random = Random()
         self.zombies = [Zombie(index, x, y) for index, (x, y) in enumerate(ZOMBIE_POINTS)]
         self.furniture = {}
