@@ -239,3 +239,6 @@ class World:
                       and hypot(z.x - player.x, z.y - player.y) <= 90
                       and self.pickup_path_clear(player.x, player.y, z.x, z.y)]
         return min(candidates, key=lambda z: hypot(z.x - x, z.y - y), default=None)
+
+    def drop_item(self, player, item):
+        pass
