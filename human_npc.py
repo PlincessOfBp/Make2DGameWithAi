@@ -217,3 +217,6 @@ class HumanNPC:
         actor.follow_route(world, self.destination, dt, 0, speed=215)
         if hypot(actor.x - self.destination[0], actor.y - self.destination[1]) < 0.01:
             self.set_command(world, "wait")
+
+    def fight(self, world, target, dt):
+        pass
