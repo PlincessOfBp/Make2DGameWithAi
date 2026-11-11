@@ -18,3 +18,8 @@ class World:
             min(max(round(x) - SCREEN_WIDTH // 2, 0), MAP_WIDTH - SCREEN_WIDTH),
             min(max(round(y) - SCREEN_HEIGHT // 2, 0), MAP_HEIGHT - SCREEN_HEIGHT),
         )
+
+
+    def move(self, x, y, dx, dy, radius):
+        # Sweep each axis separately so the actor can slide along a wall.
+        pass
