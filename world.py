@@ -217,3 +217,6 @@ class World:
                     self.pickups[f"zombie:{zombie.entity_id}"] = (
                         item, zombie.x, zombie.y, self.building_at(zombie.x, zombie.y),
                     )
+
+    def hit_zombie(self, zombie, damage):
+        pass
