@@ -77,3 +77,6 @@ class World:
                 elif y >= top + radius:
                     next_y = max(next_y, top + radius)
         return next_x, next_y
+
+    def building_at(self, x, y):
+        pass
