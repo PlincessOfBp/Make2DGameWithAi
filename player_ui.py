@@ -20,3 +20,6 @@ class PlayerUI:
         self.recipe = next(iter(RECIPES))
         self.font = None
         self.result = None
+
+    def load_font(self):
+        pass
