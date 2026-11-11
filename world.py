@@ -1,0 +1,5 @@
+from town import BUILDING_LAYOUTS, BUILDINGS, MAP_HEIGHT, MAP_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH
+
+
+class World:
+    pass
