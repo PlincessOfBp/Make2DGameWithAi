@@ -1,5 +1,7 @@
 from math import atan2, hypot, pi
 
+from item_data import TREE_DAMAGE
+
 
 class Zombie:
     def __init__(self, entity_id, x, y):
@@ -12,6 +14,7 @@ class Zombie:
         self.angle = 0.0
         self.walk_time = 0.0
         self.next_hit = 0.0
+        self.next_chop = 0.0
         self.purify_at = None
         self.command = "wait"
         self.command_target = None
@@ -100,8 +103,13 @@ class Zombie:
 
     def gather(self, world, player, dt):
         if self.command == "wood":
-            has_axe = any(player.items.get(item, 0) for item in ("axe", "stone_axe"))
-            targets = world.trees if has_axe else ()
+            tool = max((item for item in TREE_DAMAGE if player.items.get(item, 0)),
+                       key=TREE_DAMAGE.get, default=None)
+            targets = world.trees if tool is not None else ()
+            if self.command_target is not None and self.command_target not in targets:
+                self.set_command(world, "wait")
+                self.walk_time = 0.0
+                return
         else:
             targets = [(x, y) for _, item, x, y in world.visible_pickups(self.x, self.y)
                        if item == "stone"]
@@ -121,11 +129,14 @@ class Zombie:
                 self.set_command(world, "wait")
             return
         elif self.command == "wood":
-            if distance == 0 or world.pickup_path_clear(
+            if distance and not world.pickup_path_clear(
                 self.x, self.y, x - (x - self.x) * 15 / distance, y - (y - self.y) * 15 / distance
             ):
-                world.harvest_tree(player, (x, y))
-            self.set_command(world, "wait")
+                self.set_command(world, "wait")
+            elif world.resource_time >= self.next_chop:
+                self.next_chop = world.resource_time + 0.65
+                if world.hit_tree((x, y), tool):
+                    self.set_command(world, "wait")
         else:
             item = world.collect_pickup(self.x, self.y, x, y)
             if item is not None:
