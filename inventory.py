@@ -45,4 +45,4 @@ class Inventory:
         return True
 
     def unassigned_items(self):
-        pass
+        return [item for item in self.items if item not in self.slots]
