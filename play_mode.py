@@ -122,4 +122,14 @@ class PlayMode:
                 p.draw_rectangle(sx - 40, sy + 16, sx + 40, sy + 80, 66, 105, 46, filled=True)
 
     def draw_pickups(self):
-        pass
+        cam_x, cam_y = self.camera
+        image = self.images["items/items.png"]
+        size = PICKUP_ICON_HALF_SIZE * 2
+        for _, item, x, y in self.world.visible_pickups(self.player.x, self.player.y):
+            sx, sy = x - cam_x, y - cam_y
+            if image is not None:
+                source_x, source_y = ITEM_ICON_CELLS[item]
+                image.clip_draw(source_x, source_y, size, size, sx, sy)
+            else:
+                color = (145, 145, 150) if item == "stone" else (220, 173, 72)
+                p.draw_rectangle(sx - 7, sy - 7, sx + 7, sy + 7, *color, filled=True)
