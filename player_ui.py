@@ -239,4 +239,19 @@ class PlayerUI:
         self.icon(images, self.dragged_item, x, y, player.inventory.items[self.dragged_item])
 
     def ally_buttons(self):
-        pass
+        if self.gather_menu:
+            return (
+                ("wood", "나무", 262, 333, 392, 361, True),
+                ("stone", "돌멩이", 408, 333, 538, 361, True),
+                ("less", "−", 262, 294, 315, 322, self.gather_amount > 1),
+                ("more", "+", 485, 294, 538, 322, self.gather_amount < GATHER_LIMIT),
+                ("back", "뒤로", 262, 211, 392, 241, True),
+                ("start", "채집 시작", 408, 211, 538, 241, True),
+            )
+        return (
+            ("wait", "대기", 262, 333, 392, 361, True),
+            ("follow", "따라가기", 408, 333, 538, 361, True),
+            ("attack", "공동 공격", 262, 296, 392, 324, True),
+            ("gather", "채집", 408, 296, 538, 324, True),
+            ("take", "물품 받기", 262, 202, 538, 230, self.ally.human.can_take_gathered()),
+        )
