@@ -312,3 +312,6 @@ class HumanNPC:
         stop = 0 if clear else actor.RADIUS * 2 + 2
         actor.follow_route(world, self.wait_origin, dt, stop, speed=215)
         return True
+
+    def plan_melee_route(self, world, target, obstacles):
+        pass
