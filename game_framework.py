@@ -7,4 +7,27 @@ from town import SCREEN_HEIGHT, SCREEN_WIDTH
 
 class GameFramework:
     def run(self, mode):
-        pass
+        p.SDL_SetHint(b"SDL_RENDER_SCALE_QUALITY", b"0")
+        p.open_canvas(SCREEN_WIDTH, SCREEN_HEIGHT, sync=True)
+        try:
+            mode.enter()
+            previous = perf_counter()
+            while True:
+                now = perf_counter()
+                dt = now - previous
+                previous = now
+                events = p.get_events()
+                if any(event.type == p.SDL_QUIT or
+                       (event.type == p.SDL_KEYDOWN and event.key == p.SDLK_ESCAPE)
+                       for event in events):
+                    break
+                mode.handle_events(events)
+                mode.update(dt)
+                p.clear_canvas()
+                mode.draw()
+                p.update_canvas()
+        finally:
+            try:
+                mode.exit()
+            finally:
+                p.close_canvas()
