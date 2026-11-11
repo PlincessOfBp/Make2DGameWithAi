@@ -327,4 +327,9 @@ class World:
         return next((actor for actor in self.zombies if actor.entity_id == entity_id), None)
 
     def take_pickup(self, pickup_id):
-        pass
+        pickup = self.pickups.pop(pickup_id, None)
+        if pickup is None:
+            return None
+        if pickup_id.startswith("stone:"):
+            self.stone_respawns[pickup_id] = (self.resource_time + STONE_RESPAWN_SECONDS, pickup)
+        return pickup[0]
