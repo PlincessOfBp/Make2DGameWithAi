@@ -1,4 +1,8 @@
-from math import hypot
+from math import cos, hypot, sin
+from random import Random
+
+from item_data import WEAPON_DAMAGE, WOOD_TOOLS
+from zombie import Zombie
 
 from town import (
     FARMING_LOOT, PICKUP_ICON_HALF_SIZE, PICKUP_REACH,
