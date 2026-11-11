@@ -28,6 +28,7 @@ class PlayerUI:
         self.result = None
         self.ally = None
         self.gather_menu = False
+        self.dragged_item = None
 
     def load_font(self):
         windows = Path(environ.get("WINDIR", "C:/Windows")) / "Fonts"
