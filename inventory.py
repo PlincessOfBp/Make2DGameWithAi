@@ -52,4 +52,4 @@ class Inventory:
             self.slots[self.slots.index(item)] = None
 
     def selected_item(self):
-        pass
+        return None if self.selected is None else self.slots[self.selected]
