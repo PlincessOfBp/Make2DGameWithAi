@@ -351,3 +351,6 @@ class World:
                 and hypot(ally.x - player.x, ally.y - player.y) <= 90
                 and self.building_at(ally.x, ally.y) in (None, self.building_at(player.x, player.y))
                 and self.pickup_path_clear(player.x, player.y, ally.x, ally.y))
+
+    def collision_obstacles(self, actor=None):
+        pass
