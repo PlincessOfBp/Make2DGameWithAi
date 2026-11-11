@@ -45,10 +45,7 @@ class Zombie:
             if self.x == edge:
                 self.state = "escaped"
         elif self.state == "ally":
-            if self.command == "follow":
-                self.move_toward(world, player.x, player.y, dt, 215, 55)
-            else:
-                self.walk_time = 0.0
+            self.update_ally(world, player, dt)
         else:
             distance = hypot(player.x - self.x, player.y - self.y)
             if distance <= 31 and world.pickup_path_clear(self.x, self.y, player.x, player.y):
