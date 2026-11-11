@@ -2,4 +2,5 @@ from math import atan2, hypot, pi
 
 
 class Zombie:
-    pass
+    def __init__(self, entity_id, x, y):
+        pass
