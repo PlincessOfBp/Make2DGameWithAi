@@ -105,8 +105,6 @@ class HumanNPC:
             points = [(pickup_id, x, y) for pickup_id, item, x, y in world.visible_pickups(*start)
                       if item == "stone"]
         for target, x, y in sorted(points, key=lambda entry: hypot(entry[1] - actor.x, entry[2] - actor.y)):
-            if hypot(x - actor.x, y - actor.y) > GATHER_RANGE:
-                break
             angle = atan2(actor.y - y, actor.x - x)
             goals = [(x, y)] if self.command == "stone" else [
                 (x + cos(angle + turn * pi / 2) * 30, y + sin(angle + turn * pi / 2) * 30)
