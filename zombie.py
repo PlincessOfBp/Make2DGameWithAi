@@ -14,3 +14,6 @@ class Zombie:
         self.next_hit = 0.0
         self.purify_at = None
         self.command = "wait"
+
+    def move_toward(self, world, x, y, dt, speed, stop):
+        pass
