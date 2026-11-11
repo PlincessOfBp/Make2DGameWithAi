@@ -120,6 +120,9 @@ class PlayMode:
             cam_x, cam_y = self.camera
             self.player.aim(mouse_x + cam_x, mouse_y + cam_y, dt)
         self.player.update_action(self.world, dt)
+        for actor in self.world.zombies:
+            if actor.state in ("zombie", "ally"):
+                actor.advance_attack(self.world, self.player)
         for zombie in self.world.zombies:
             zombie.update(self.world, self.player, dt)
         if self.ui.ally is not None and self.ui.ally.state != "ally":
