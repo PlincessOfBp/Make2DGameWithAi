@@ -46,7 +46,7 @@ class Player:
             return False
         dx, dy = target_x - self.x, target_y - self.y
         self.action_angle = atan2(dy, dx) - pi / 2 if dx or dy else self.target_angle
-        selected = self.inventory.slots[self.inventory.selected]
+        selected = self.inventory.selected_item()
         self.action_weapon = selected if action == "attack" and selected in WEAPON_COLUMNS else None
         self.action = action
         self.action_elapsed = 0.0
@@ -64,7 +64,7 @@ class Player:
             self.action = None
 
     def use_selected(self, world):
-        item = self.inventory.slots[self.inventory.selected]
+        item = self.inventory.selected_item()
         if item == "canned_food" and (self.health < 100 or self.infection > 0):
             self.health = min(100, self.health + 30)
             self.infection = max(0, self.infection - 20)
@@ -83,7 +83,7 @@ class Player:
         self.hurt_until = now + 0.16 if self.health else 0.0
 
     def drop_selected(self, world):
-        item = self.inventory.slots[self.inventory.selected]
+        item = self.inventory.selected_item()
         if item is None or not world.drop_item(self, item):
             return False
         self.inventory.remove(item)
