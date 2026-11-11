@@ -29,6 +29,7 @@ class Zombie:
         self.command = "wait"
         self.command_target = None
         self.attack_until = 0.0
+        self.attack_target = None
         self.hurt_until = 0.0
         self.human = False
         self.last_seen = None
