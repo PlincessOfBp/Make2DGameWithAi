@@ -64,9 +64,9 @@ class Zombie:
         else:
             self.hunt(world, player, dt)
 
-    def set_command(self, world, command):
+    def set_command(self, world, command, amount=1):
         if self.state == "ally":
-            self.human.set_command(world, command)
+            self.human.set_command(world, command, amount)
 
     def follow_route(self, world, goal, dt, stop, speed=None):
         speed = self.speed if speed is None else speed
