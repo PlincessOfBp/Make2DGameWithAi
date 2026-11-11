@@ -195,8 +195,7 @@ class PlayerUI:
                 self.ally.set_command(world, self.gather_resource, self.gather_amount)
                 self.ally = None
             elif action == "take":
-                if player is not None:
-                    self.ally.human.take_gathered(player)
+                self.ally.human.take_gathered(player)
             else:
                 self.ally.set_command(world, action)
                 self.ally = None
