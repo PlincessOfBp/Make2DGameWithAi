@@ -226,4 +226,10 @@ class World:
             )
 
     def harvest_tree(self, player, position):
-        pass
+        if position not in self.trees:
+            return False
+        self.trees.remove(position)
+        self.walls.remove(self.tree_walls[position])
+        self.tree_respawns[position] = self.resource_time + TREE_RESPAWN_SECONDS
+        player.inventory.add("wood")
+        return True
