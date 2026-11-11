@@ -238,6 +238,7 @@ class HumanNPC:
         elif actor.advance_attack(world, player):
             return
         elif self.protect(world, dt):
+            self.melee_route.clear()
             self.gather_pending = False
             self.gather_until = 0.0
         elif self.command == "follow":
