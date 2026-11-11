@@ -79,4 +79,9 @@ class World:
         return next_x, next_y
 
     def building_at(self, x, y):
-        pass
+
+        for index, (_, _, _, _, _, footprint) in enumerate(self.buildings):
+            if any(left <= x <= right and bottom <= y <= top
+                   for left, bottom, right, top in footprint):
+                return index
+        return None
