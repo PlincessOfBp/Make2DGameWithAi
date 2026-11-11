@@ -331,4 +331,11 @@ class PlayMode:
             self.ui.text(x + 13, y + 36, f"{max(0, zombie.purify_at - self.world.resource_time):.1f}")
 
     def draw_barricades(self):
-        pass
+        cam_x, cam_y = self.camera
+        barricade = self.images["world/props/barricade.png"]
+        for x, y in self.world.barricades:
+            x, y = x - cam_x, y - cam_y
+            if barricade is not None:
+                barricade.draw(x, y + 10)
+            else:
+                p.draw_rectangle(x-29, y-14, x+29, y+14, 118, 77, 46, filled=True)
