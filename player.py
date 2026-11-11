@@ -30,7 +30,9 @@ class Player:
             self.walk_time = 0.0
             return
         distance = self.SPEED * dt / length
-        x, y = world.move(self.x, self.y, horizontal * distance, vertical * distance, self.RADIUS)
+        x, y = world.move(
+            self.x, self.y, horizontal * distance, vertical * distance, self.RADIUS, actor=self,
+        )
         self.walk_time = self.walk_time + dt if (x, y) != (self.x, self.y) else 0.0
         self.x, self.y = x, y
 
