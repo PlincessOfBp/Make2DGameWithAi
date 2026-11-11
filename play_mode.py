@@ -214,7 +214,7 @@ class PlayMode:
             if building is not None and building != current_building:
                 continue
             x, y = round(zombie.x) - cam_x, round(zombie.y) - cam_y
-            human = zombie.state in ("ally", "fleeing")
+            human = zombie.human
             kind = "human" if human else "zombie"
             image = self.images[f"characters/{kind}_{zombie.variant:02}.png"]
             if image is not None:
