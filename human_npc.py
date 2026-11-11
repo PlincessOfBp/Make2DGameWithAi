@@ -1,5 +1,6 @@
 from math import atan2, cos, hypot, pi, sin, tau
 
+from inventory import Inventory
 from item_data import TREE_DAMAGE
 from town import MAP_HEIGHT, MAP_WIDTH
 
