@@ -15,4 +15,5 @@ UI_ASSETS = (
 
 
 class PlayerUI:
-    pass
+    def __init__(self):
+        pass
