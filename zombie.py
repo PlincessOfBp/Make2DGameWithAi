@@ -160,4 +160,26 @@ class Zombie:
         self.walk_time = 0.0
 
     def follow_route(self, world, goal, dt, stop):
-        pass
+        start = (self.x, self.y)
+        if world.pickup_path_clear(*start, *goal, CHASE_RADIUS):
+            self.route.clear()
+            self.route_goal = None
+            self.move_toward(world, *goal, dt, self.speed, stop)
+            return
+
+        if self.route and not world.pickup_path_clear(*start, *self.route[0], CHASE_RADIUS):
+            self.route.clear()
+        goal_changed = self.route_goal is None or hypot(
+            goal[0] - self.route_goal[0], goal[1] - self.route_goal[1]
+        ) > 24
+        if (not self.route or goal_changed) and world.resource_time >= self.next_route_at:
+            self.route = world.find_route(start, goal, CHASE_RADIUS)
+            self.route_goal = goal
+            self.next_route_at = world.resource_time + ROUTE_RETRY
+        if not self.route:
+            self.walk_time = 0.0
+            return
+        waypoint = self.route[0]
+        self.move_toward(world, *waypoint, dt, self.speed, 0)
+        if hypot(self.x - waypoint[0], self.y - waypoint[1]) < 0.01:
+            self.route.pop(0)
