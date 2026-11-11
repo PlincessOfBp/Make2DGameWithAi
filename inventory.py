@@ -8,8 +8,9 @@ class Inventory:
         self.selected = 0
 
     def add(self, item):
-        self.items[item] = self.items.get(item, 0) + 1
-        if item in HOTBAR_ITEMS and item not in self.slots and None in self.slots:
+        previous = self.items.get(item, 0)
+        self.items[item] = previous + 1
+        if not previous and item in HOTBAR_ITEMS and None in self.slots:
             self.slots[self.slots.index(None)] = item
 
     def remove(self, item, count=1):
