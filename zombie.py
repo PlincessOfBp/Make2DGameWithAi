@@ -158,3 +158,6 @@ class Zombie:
                 player.inventory.add(item)
             self.set_command(world, "wait")
         self.walk_time = 0.0
+
+    def follow_route(self, world, goal, dt, stop):
+        pass
