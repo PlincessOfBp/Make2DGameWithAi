@@ -292,4 +292,13 @@ class HumanNPC:
         return self.command not in ("wood", "stone", "return") and bool(self.inventory.items)
 
     def return_to_wait(self, world, dt):
-        pass
+        actor = self.actor
+        distance = hypot(actor.x - self.wait_origin[0], actor.y - self.wait_origin[1])
+        if distance <= 0.5:
+            self.returning_to_wait = False
+            return False
+        obstacles = world.collision_obstacles(actor)
+        clear = world.pickup_path_clear(*self.wait_origin, *self.wait_origin, actor.RADIUS, obstacles)
+        stop = 0 if clear else actor.RADIUS * 2 + 2
+        actor.follow_route(world, self.wait_origin, dt, stop, speed=215)
+        return True
