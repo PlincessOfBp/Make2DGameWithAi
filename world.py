@@ -1,4 +1,5 @@
-from math import cos, hypot, sin
+from itertools import count
+from math import cos, hypot, pi, sin
 from random import Random
 
 from item_data import WEAPON_DAMAGE, WOOD_TOOLS
