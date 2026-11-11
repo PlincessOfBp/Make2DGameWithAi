@@ -102,3 +102,6 @@ class HumanNPC:
                     actor.route, actor.route_goal = route, goal
                     return True
         return False
+
+    def gather(self, world, player, dt):
+        pass
