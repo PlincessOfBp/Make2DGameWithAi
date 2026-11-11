@@ -139,7 +139,7 @@ class World:
             return None
         _, pickup_id = nearest
         pickup = self.pickups.pop(pickup_id)
-        if pickup[0] == "stone":
+        if pickup_id.startswith("stone:"):
             self.stone_respawns[pickup_id] = (self.resource_time + STONE_RESPAWN_SECONDS, pickup)
         return pickup[0]
 
