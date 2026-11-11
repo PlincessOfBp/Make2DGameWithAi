@@ -20,3 +20,6 @@ class Inventory:
             del self.items[item]
             if item in self.slots:
                 self.slots[self.slots.index(item)] = None
+
+    def assign(self, item):
+        pass
