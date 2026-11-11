@@ -150,3 +150,6 @@ class HumanNPC:
             actor.next_chop = now + 0.65
         else:
             actor.walk_time = 0.0
+
+    def update(self, world, player, dt):
+        pass
