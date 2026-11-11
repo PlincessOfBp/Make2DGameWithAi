@@ -307,3 +307,6 @@ class PlayMode:
         # World Y increases away from the viewer; the trunk anchors each tree's depth.
         for _, draw, args in sorted(draw_order, key=lambda entry: entry[0], reverse=True):
             draw(*args)
+
+    def draw_held_weapon(self, item, angle, x, y, hand_y, swing=None):
+        pass
