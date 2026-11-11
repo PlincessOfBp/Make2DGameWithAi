@@ -10,10 +10,6 @@ from item_data import ITEM_ICON_CELLS, ITEM_NAMES, RECIPES
 HOTBAR_X, HOTBAR_TOP = 259, 68
 INVENTORY_X, INVENTORY_TOP = 225, 439
 CRAFT_X, CRAFT_TOP = 180, 450
-ALLY_COMMANDS = (
-    ("wait", "대기"), ("follow", "따라가기"), ("attack", "공동 공격"), ("gather", "채집"),
-)
-GATHER_COMMANDS = (("wood", "나무"), ("stone", "돌멩이"), ("back", "뒤로"))
 ALLY_LEFT, ALLY_TOP = 240, 412
 
 UI_ASSETS = (
@@ -215,14 +211,27 @@ class PlayerUI:
         if self.ally is None:
             return
         self.panel(images, "panel", ALLY_LEFT, ALLY_TOP, 320, 224)
-        title = "채집 자원 선택" if self.gather_menu else "조력자 명령"
-        self.text(ALLY_LEFT + 27, ALLY_TOP - 25, title)
-        options = GATHER_COMMANDS if self.gather_menu else ALLY_COMMANDS
-        for index, (_, label) in enumerate(options):
-            top = ALLY_TOP - 52 - index * 34
-            p.draw_rectangle(ALLY_LEFT + 26, top - 28, ALLY_LEFT + 294, top,
-                             64, 66, 65, filled=True)
-            self.text(ALLY_LEFT + 40, top - 14, label)
+        self.text(ALLY_LEFT + 27, ALLY_TOP - 25, "채집 설정" if self.gather_menu else "조력자 명령")
+        human = self.ally.human
+        for action, label, left, bottom, right, top, enabled in self.ally_buttons():
+            selected = (action == self.gather_resource if self.gather_menu else action == human.command)
+            color = (112, 89, 50) if selected else (64, 66, 65)
+            if not enabled:
+                color = (43, 45, 46)
+            p.draw_rectangle(left, bottom, right, top, *color, filled=True)
+            self.text(left + 14, (bottom + top) // 2, label,
+                      (248, 239, 218) if enabled else (155, 153, 149))
+        if self.gather_menu:
+            self.text(366, 308, f"수량  {self.gather_amount}")
+        else:
+            if human.command in ("wood", "stone"):
+                status = f"채집 중  ·  남은 수량 {human.gather_remaining}"
+            else:
+                status = {"return": "명령 지점으로 복귀 중", "follow": "따라가기 · 전투 지원",
+                          "attack": "공동 공격 중", "wait": "대기 중"}[human.command]
+            self.text(264, 275, status)
+            counts = "  ".join(f"{ITEM_NAMES[item]} {count}" for item, count in human.inventory.items.items())
+            self.text(264, 250, f"보관 물품  {counts or '없음'}")
 
     def hotbar_slot_at(self, x, y):
         dx, dy = x - HOTBAR_X - 9, HOTBAR_TOP - y - 8
