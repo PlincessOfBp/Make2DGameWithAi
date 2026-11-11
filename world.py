@@ -262,4 +262,16 @@ class World:
         return False
 
     def hit_tree(self, position, weapon):
-        pass
+        damage = TREE_DAMAGE.get(weapon)
+        if damage is None or position not in self.trees:
+            return False
+        remaining = self.trees[position] - damage
+        if remaining > 0:
+            self.trees[position] = remaining
+            return False
+        del self.trees[position]
+        self.walls.remove(self.tree_walls[position])
+        self.tree_respawns[position] = self.resource_time + TREE_RESPAWN_SECONDS
+        x, y = position
+        self.pickups[f"drop:{next(self.drop_ids)}"] = ("wood", x, y, self.building_at(x, y))
+        return True
