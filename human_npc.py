@@ -33,3 +33,6 @@ class HumanNPC:
         self.actor.walk_time = 0.0
         self.actor.attack_target = None
         self.actor.attack_until = 0.0
+
+    def flee(self, world, dt):
+        pass
