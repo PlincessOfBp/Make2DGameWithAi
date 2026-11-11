@@ -56,8 +56,9 @@ class HumanNPC:
         actor.follow_route(world, self.destination, dt, 0, speed=190)
         if hypot(actor.x - self.destination[0], actor.y - self.destination[1]) < 0.01:
             actor.state = "escaped"
-        elif not actor.route and not actor.walk_time and world.resource_time >= actor.next_route_at:
+        elif dt > 0 and not actor.route and not actor.walk_time:
             self.destination = None
+            self.escape_retry_at = world.resource_time + 0.4
 
     def protect(self, world, dt):
         actor = self.actor
