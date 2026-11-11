@@ -166,12 +166,10 @@ class PlayerUI:
                              *((111, 90, 53) if enabled else (60, 63, 65)), filled=True)
             self.text(CRAFT_X + 326, CRAFT_TOP - 237, "제작" if enabled else "재료 부족")
 
-    def click_ally(self, world, x, y, button, player=None):
+    def click_ally(self, world, x, y, button, player):
         if self.ally is None:
             return False
-        if self.ally.state != "ally" or (
-            player is not None and not world.can_command_ally(player, self.ally)
-        ):
+        if not world.can_command_ally(player, self.ally):
             self.ally = None
             return True
         if button != p.SDL_BUTTON_LEFT:
