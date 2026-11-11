@@ -26,4 +26,4 @@ class PlayMode:
 
 
     def exit(self):
-        pass
+        self.images.clear()
