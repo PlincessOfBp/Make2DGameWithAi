@@ -34,10 +34,11 @@ BUILDING_LAYOUTS = {
     ),
 }
 
-# Houses use larger footprints to fill their lots.
+# Building scales are tuned to their lots.
 BUILDING_SCALES = {
     "house_small": 1.625,
     "house_corner": 1.5,
+    "shop": 1.4,
 }
 
 # Type and world-space center, aligned with the eight lots in ground.png.
