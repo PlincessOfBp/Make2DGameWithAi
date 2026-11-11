@@ -10,4 +10,5 @@ GATHER_RANGE = 250
 
 
 class HumanNPC:
-    pass
+    def __init__(self, actor):
+        pass
