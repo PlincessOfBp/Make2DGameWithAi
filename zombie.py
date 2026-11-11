@@ -107,24 +107,14 @@ class Zombie:
         return nearest
 
     def hunt(self, world, player, dt):
+        if self.advance_attack(world, player):
+            return
         target = self.see_target(world, player)
         if target is not None:
             self.last_seen = (target.x, target.y)
             self.seen_until = world.resource_time + SIGHT_MEMORY
-            if hypot(target.x - self.x, target.y - self.y) <= 31:
-                self.walk_time = 0.0
-                self.angle = atan2(target.y - self.y, target.x - self.x) - pi / 2
-                if world.resource_time >= self.next_hit:
-                    if target is player:
-                        player.take_damage(5, world.resource_time)
-                    else:
-                        target.health = max(0, target.health - 5)
-                        if target.health == 0:
-                            target.state = "dead"
-                        else:
-                            target.hurt_until = world.resource_time + 0.16
-                    self.next_hit = world.resource_time + 2
-                    self.attack_until = world.resource_time + 0.24
+            if hypot(target.x - self.x, target.y - self.y) <= ATTACK_REACH:
+                self.start_attack(target, world.resource_time)
                 return
             self.follow_route(world, self.last_seen, dt, 27)
         elif (self.last_seen is not None and world.resource_time < self.seen_until
@@ -154,6 +144,7 @@ class Zombie:
             if (valid and target.health > 0
                     and hypot(target.x - self.x, target.y - self.y) <= ATTACK_REACH
                     and world.pickup_path_clear(self.x, self.y, target.x, target.y)):
+                self.next_hit = now + NPC_ATTACK_INTERVAL
                 if target is player:
                     player.take_damage(NPC_ATTACK_DAMAGE, now)
                 elif target.state == "zombie":
