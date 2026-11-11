@@ -45,3 +45,14 @@ BUILDINGS = (
     ("house_small", 2130, 620),
     ("house_small", 1730, 300),
 )
+
+# Prop name, local sprite center, and solid footprint size.
+FURNITURE = {
+    "house_small": (("table", 139, 53, 54, 30),),
+    "house_corner": (("table", 105, 55, 54, 30),),
+    "shop": (
+        ("shelf", 53, 94, 48, 32),
+        ("shelf", 210, 94, 48, 32),
+        ("checkout", 199, 43, 62, 35),
+    ),
+}
