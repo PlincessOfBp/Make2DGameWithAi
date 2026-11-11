@@ -256,7 +256,11 @@ class PlayMode:
             elif self.world.resource_time < zombie.hurt_until:
                 row, frame = (5 if human else 4), 0
             elif self.world.resource_time < zombie.attack_until:
-                row, frame = 2, 1
+                elapsed = self.world.resource_time - (zombie.attack_until - ATTACK_FRAME_TIME * 3)
+                row, frame = 2, min(2, max(0, int((elapsed + 1e-9) / ATTACK_FRAME_TIME)))
+            elif human and self.world.resource_time < human.gather_until:
+                elapsed = self.world.resource_time - (human.gather_until - GATHER_FRAME_TIME * 2)
+                row, frame = 3, int(elapsed + 1e-9 >= GATHER_FRAME_TIME)
             else:
                 row = int(zombie.walk_time > 0)
                 frame = int(zombie.walk_time * 9) % 4 if row == 1 else 0
