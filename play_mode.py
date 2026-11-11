@@ -4,7 +4,8 @@ from pathlib import Path
 import pico2d as p
 
 from player import Player
-from town import ITEM_ICON_CELLS, PICKUP_ICON_HALF_SIZE, SCREEN_HEIGHT, SCREEN_WIDTH, TREE_DRAW_OFFSET
+from item_data import ITEM_ICON_CELLS
+from town import PICKUP_ICON_HALF_SIZE, SCREEN_HEIGHT, SCREEN_WIDTH, TREE_DRAW_OFFSET
 from world import World
 
 
