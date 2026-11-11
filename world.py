@@ -148,3 +148,6 @@ class World:
             if self.resource_time >= ready_at and hypot(player_x - x, player_y - y) >= STONE_SPAWN_CLEARANCE:
                 self.pickups[pickup_id] = pickup
                 del self.stone_respawns[pickup_id]
+
+    def place_barricade(self, player, x, y):
+        pass
