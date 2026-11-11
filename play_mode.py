@@ -44,6 +44,7 @@ class PlayMode:
 
     def exit(self):
         self.images.clear()
+        self.ui.font = None
 
     def handle_events(self, events):
         for event in events:
