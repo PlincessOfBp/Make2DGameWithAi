@@ -18,3 +18,6 @@ class HumanNPC:
         self.gather_until = 0.0
         self.gather_pending = False
         self.tool = None
+
+    def set_command(self, world, command):
+        pass
