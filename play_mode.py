@@ -59,6 +59,7 @@ class PlayMode:
                 if p.SDLK_1 <= event.key <= p.SDLK_5:
                     self.player.inventory.selected = event.key - p.SDLK_1
                 elif event.key == p.SDLK_i:
+                    self.ui.ally = None
                     self.ui.page = "inventory" if self.ui.page is None else None
                 elif self.ui.page is None and event.key == p.SDLK_e:
                     self.player.use_selected(self.world)
