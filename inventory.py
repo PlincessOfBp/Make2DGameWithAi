@@ -7,9 +7,9 @@ class Inventory:
         self.slots = [None] * 5
         self.selected = 0
 
-    def add(self, item):
+    def add(self, item, count=1):
         previous = self.items.get(item, 0)
-        self.items[item] = previous + 1
+        self.items[item] = previous + count
         if not previous and item in HOTBAR_ITEMS and None in self.slots:
             self.slots[self.slots.index(None)] = item
 
