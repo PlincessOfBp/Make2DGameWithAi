@@ -68,9 +68,9 @@ class PlayerUI:
             dx, dy = x - INVENTORY_X - 16, INVENTORY_TOP - y - 49
             if 0 <= dx < 6 * 54 and 0 <= dy < 3 * 54 and dx % 54 < 48 and dy % 54 < 48:
                 index = dy // 54 * 6 + dx // 54
-                items = [item for item in ITEM_NAMES if item in inventory.items]
+                items = inventory.unassigned_items()
                 if index < len(items):
-                    inventory.assign(items[index])
+                    self.dragged_item = items[index]
         else:
             dx, dy = x - CRAFT_X, CRAFT_TOP - y
             if 20 <= dx < 154 and 56 <= dy < 56 + 3 * 63 and (dy - 56) % 63 < 56:
