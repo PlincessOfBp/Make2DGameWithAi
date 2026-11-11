@@ -139,12 +139,7 @@ class PlayMode:
         else:
             p.draw_rectangle(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, 91, 112, 75, filled=True)
         self.draw_buildings(interiors=True)
-        self.draw_trees(foreground=False)
-        self.draw_actors()
-        self.draw_pickups()
-        self.draw_player()
-        self.draw_weapon()
-        self.draw_trees(foreground=True)
+        self.draw_world_objects()
         self.draw_buildings(interiors=False)
         remaining = sum(z.state == "zombie" for z in self.world.zombies)
         self.ui.draw_hud(self.images, self.player, remaining)
@@ -198,24 +193,6 @@ class PlayMode:
             p.draw_line(x, y, x-sin(player.angle)*radius, y+cos(player.angle)*radius,
                         255, 255, 255)
 
-    def draw_trees(self, foreground):
-
-        cam_x, cam_y = self.camera
-        image = self.images["world/props/tree.png"]
-        for (x, y), hp in self.world.trees.items():
-            if (y < self.player.y) != foreground:
-                continue
-            sx, sy = x - cam_x, y - cam_y
-            if image is not None:
-                image.draw(sx, sy + TREE_DRAW_OFFSET)
-            else:
-                p.draw_rectangle(sx - 9, sy - 8, sx + 9, sy + 16, 105, 73, 40, filled=True)
-                p.draw_rectangle(sx - 40, sy + 16, sx + 40, sy + 80, 66, 105, 46, filled=True)
-            if hp < TREE_MAX_HP:
-                p.draw_rectangle(sx - 16, sy + 19, sx + 16, sy + 23, 55, 48, 42, filled=True)
-                width = round(32 * hp / TREE_MAX_HP)
-                p.draw_rectangle(sx - 16, sy + 19, sx - 16 + width, sy + 23, 222, 174, 79, filled=True)
-
     def draw_pickups(self):
         cam_x, cam_y = self.camera
         image = self.images["items/items.png"]
@@ -228,47 +205,6 @@ class PlayMode:
             else:
                 color = (145, 145, 150) if item == "stone" else (220, 173, 72)
                 p.draw_rectangle(sx - 7, sy - 7, sx + 7, sy + 7, *color, filled=True)
-
-    def draw_actors(self):
-        cam_x, cam_y = self.camera
-        current_building = self.world.building_at(self.player.x, self.player.y)
-        for zombie in self.world.zombies:
-            if zombie.state == "escaped":
-                continue
-            building = self.world.building_at(zombie.x, zombie.y)
-            if building is not None and building != current_building:
-                continue
-            x, y = round(zombie.x) - cam_x, round(zombie.y) - cam_y
-            human = zombie.human
-            kind = "human" if human else "zombie"
-            image = self.images[f"characters/{kind}_{zombie.variant:02}.png"]
-            if image is not None:
-                if zombie.state == "dead":
-                    row, frame = (4 if human else 3), 0
-                elif self.world.resource_time < zombie.hurt_until:
-                    row, frame = (5 if human else 4), 0
-                elif self.world.resource_time < zombie.attack_until:
-                    row, frame = 2, 1
-                else:
-                    row = int(zombie.walk_time > 0)
-                    frame = int(zombie.walk_time * 9) % 4 if row == 1 else 0
-                image.clip_composite_draw(frame * 64, image.h - (row + 1) * 64,
-                                          64, 64, 0 if zombie.state == "dead" else zombie.angle,
-                                          "", x, y, 64, 64)
-            else:
-                p.draw_rectangle(x-8, y-8, x+8, y+8, 82, 154, 84, filled=True)
-            if zombie.purify_at is not None:
-                icon = self.images["ui/purifying.png"]
-                if icon is not None:
-                    icon.draw(x, y + 36)
-                self.ui.text(x + 13, y + 36, f"{max(0, zombie.purify_at - self.world.resource_time):.1f}")
-        barricade = self.images["world/props/barricade.png"]
-        for x, y in self.world.barricades:
-            x, y = x - cam_x, y - cam_y
-            if barricade is not None:
-                barricade.draw(x, y + 10)
-            else:
-                p.draw_rectangle(x-29, y-14, x+29, y+14, 118, 77, 46, filled=True)
 
     def draw_weapon(self):
         player = self.player
