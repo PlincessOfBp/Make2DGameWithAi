@@ -151,3 +151,6 @@ class PlayMode:
             else:
                 color = (145, 145, 150) if item == "stone" else (220, 173, 72)
                 p.draw_rectangle(sx - 7, sy - 7, sx + 7, sy + 7, *color, filled=True)
+
+    def draw_actors(self):
+        pass
