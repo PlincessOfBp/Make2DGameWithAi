@@ -85,3 +85,6 @@ class World:
                    for left, bottom, right, top in footprint):
                 return index
         return None
+
+    def visible_pickups(self, x, y):
+        pass
