@@ -31,3 +31,6 @@ class PlayerUI:
                     return
                 except (OSError, ValueError):
                     continue
+
+    def click(self, player, x, y, button):
+        pass
