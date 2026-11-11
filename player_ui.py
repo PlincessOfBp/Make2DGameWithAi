@@ -89,4 +89,26 @@ class PlayerUI:
             self.text(x + 8, y - 12, str(count))
 
     def draw_hud(self, images, player, remaining):
-        pass
+        inventory = player.inventory
+        for index, (name, value, color) in enumerate((
+            ("health", player.health, (177, 56, 54)),
+            ("infection", player.infection, (88, 152, 95)),
+        )):
+            y = 574 - index * 28
+            image = images[f"ui/{name}.png"]
+            if image is not None:
+                image.draw(22, y)
+            p.draw_rectangle(38, y - 8, 138, y + 8, 43, 44, 46, filled=True)
+            if value > 0:
+                p.draw_rectangle(38, y - 8, 38 + value, y + 8, *color, filled=True)
+            self.text(145, y, str(int(value)))
+        self.text(662, 574, f"남은 좀비 {remaining}")
+        self.panel(images, "quickbar", HOTBAR_X, HOTBAR_TOP, 282, 64)
+        for index, item in enumerate(inventory.slots):
+            x = HOTBAR_X + 33 + index * 54
+            y = HOTBAR_TOP - 32
+            if index == inventory.selected:
+                self.panel(images, "slot_selected", x - 24, y + 24, 48, 48)
+            if item is not None:
+                self.icon(images, item, x, y, inventory.items[item])
+            self.text(x - 20, y + 16, str(index + 1))
