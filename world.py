@@ -105,7 +105,7 @@ class World:
             if location is None or location == building:
                 yield pickup_id, item, px, py
 
-    def pickup_path_clear(self, x, y, target_x, target_y):
+    def pickup_path_clear(self, x, y, target_x, target_y, clearance=0):
 
         dx, dy = target_x - x, target_y - y
         for left, bottom, right, top in self.walls:
