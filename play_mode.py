@@ -218,8 +218,13 @@ class PlayMode:
             kind = "human" if human else "zombie"
             image = self.images[f"characters/{kind}_{zombie.variant:02}.png"]
             if image is not None:
-                row = 3 if zombie.state == "dead" else int(zombie.walk_time > 0)
-                frame = int(zombie.walk_time * 9) % 4 if row == 1 else 0
+                if zombie.state == "dead":
+                    row, frame = (4 if human else 3), 0
+                elif self.world.resource_time < zombie.attack_until:
+                    row, frame = 2, 1
+                else:
+                    row = int(zombie.walk_time > 0)
+                    frame = int(zombie.walk_time * 9) % 4 if row == 1 else 0
                 image.clip_composite_draw(frame * 64, (4 if human else 3) * 64 - row * 64,
                                           64, 64, zombie.angle, "", x, y, 64, 64)
             else:
