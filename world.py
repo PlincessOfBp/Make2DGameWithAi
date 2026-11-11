@@ -280,8 +280,9 @@ class World:
             inventory.add("wood")
         return True
 
-    def find_route(self, start, goal, radius):
-        if self.pickup_path_clear(*start, *goal, radius):
+    def find_route(self, start, goal, radius, obstacles=None):
+        walls = self.walls if obstacles is None else obstacles
+        if self.pickup_path_clear(*start, *goal, radius, walls):
             return [goal]
 
         # Wall corners make waypoints without snapping actors to a grid at narrow doors.
@@ -289,13 +290,13 @@ class World:
         min_x, max_x = sorted((start[0], goal[0]))
         min_y, max_y = sorted((start[1], goal[1]))
         corners = set()
-        for left, bottom, right, top in self.walls:
+        for left, bottom, right, top in walls:
             if right < min_x - 240 or left > max_x + 240 or top < min_y - 240 or bottom > max_y + 240:
                 continue
             for x in (left - margin, right + margin):
                 for y in (bottom - margin, top + margin):
                     if (radius <= x <= MAP_WIDTH - radius and radius <= y <= MAP_HEIGHT - radius
-                            and self.pickup_path_clear(x, y, x, y, radius)):
+                            and self.pickup_path_clear(x, y, x, y, radius, walls)):
                         corners.add((x, y))
         candidates = sorted(corners | {goal})
         estimate = {point: hypot(goal[0] - point[0], goal[1] - point[1]) for point in candidates}
@@ -319,7 +320,7 @@ class World:
                     continue
                 cost = distance + hypot(candidate[0] - point[0], candidate[1] - point[1])
                 if (cost >= distances.get(candidate, float("inf"))
-                        or not self.pickup_path_clear(*point, *candidate, radius)):
+                        or not self.pickup_path_clear(*point, *candidate, radius, walls)):
                     continue
                 distances[candidate] = cost
                 parents[candidate] = point
