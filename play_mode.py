@@ -104,3 +104,6 @@ class PlayMode:
             p.draw_rectangle(x-radius, y-radius, x+radius, y+radius, 60, 140, 220, filled=True)
             p.draw_line(x, y, x-sin(player.angle)*radius, y+cos(player.angle)*radius,
                         255, 255, 255)
+
+    def draw_trees(self, foreground):
+        pass
