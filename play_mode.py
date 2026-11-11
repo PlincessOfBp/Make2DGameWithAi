@@ -329,3 +329,6 @@ class PlayMode:
             if icon is not None:
                 icon.draw(x, y + 36)
             self.ui.text(x + 13, y + 36, f"{max(0, zombie.purify_at - self.world.resource_time):.1f}")
+
+    def draw_barricades(self):
+        pass
