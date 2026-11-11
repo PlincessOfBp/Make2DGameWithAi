@@ -194,3 +194,6 @@ class HumanNPC:
         elif world.resource_time >= self.gather_until:
             self.tool = None
             self.protect(world, dt)
+
+    def take_gathered(self, player):
+        pass
