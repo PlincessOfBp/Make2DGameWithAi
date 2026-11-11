@@ -80,6 +80,11 @@ class PlayMode:
                 if event.button == p.SDL_BUTTON_LEFT:
                     self.player.start_action("attack", *target)
                 elif event.button == p.SDL_BUTTON_RIGHT:
+                    ally = self.world.ally_at(self.player, *target)
+                    if ally is not None:
+                        self.ui.ally = ally
+                        self.ui.gather_menu = False
+                        continue
                     item = self.world.collect_pickup(self.player.x, self.player.y, *target)
                     if item is not None:
                         self.player.inventory.add(item)
