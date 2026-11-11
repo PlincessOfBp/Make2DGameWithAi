@@ -241,4 +241,22 @@ class World:
         return min(candidates, key=lambda z: hypot(z.x - x, z.y - y), default=None)
 
     def drop_item(self, player, item):
-        pass
+        # Try in front first, then nearby directions when a wall or pickup blocks the spot.
+        building = self.building_at(player.x, player.y)
+        for offset in (0, pi / 4, -pi / 4, pi / 2, -pi / 2, pi):
+            angle = player.target_angle + offset
+            for distance in (44, 30):
+                x = round(player.x - sin(angle) * distance)
+                y = round(player.y + cos(angle) * distance)
+                if self.building_at(x, y) != building:
+                    continue
+                if self.move(player.x, player.y, x - player.x, y - player.y, 8) != (x, y):
+                    continue
+                if not self.pickup_path_clear(player.x, player.y, x, y):
+                    continue
+                if any(hypot(x - px, y - py) < 24 for _, px, py, _ in self.pickups.values()):
+                    continue
+                pickup_id = f"drop:{next(self.drop_ids)}"
+                self.pickups[pickup_id] = (item, x, y, building)
+                return True
+        return False
