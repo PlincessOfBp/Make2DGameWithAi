@@ -148,6 +148,18 @@ class World:
             if self.resource_time >= ready_at and hypot(player_x - x, player_y - y) >= STONE_SPAWN_CLEARANCE:
                 self.pickups[pickup_id] = pickup
                 del self.stone_respawns[pickup_id]
+        for (x, y), ready_at in tuple(self.tree_respawns.items()):
+            wall = self.tree_walls[x, y]
+            left, bottom, right, top = wall
+            occupied = hypot(player_x - x, player_y - y) < 32 or any(
+                hypot(z.x - x, z.y - y) < 24 for z in self.zombies if z.state not in ("dead", "escaped")
+            )
+            overlaps_wall = any(left < r and right > l and bottom < t and top > b
+                                for l, b, r, t in self.walls)
+            if self.resource_time >= ready_at and not occupied and not overlaps_wall:
+                self.trees.append((x, y))
+                self.walls.append(wall)
+                del self.tree_respawns[x, y]
 
     def place_barricade(self, player, x, y):
         left, bottom, right, top = x - 29, y - 14, x + 29, y + 14
