@@ -322,3 +322,6 @@ class World:
                 parents[candidate] = point
                 heappush(frontier, (cost + estimate[candidate], cost, candidate))
         return []
+
+    def actor_by_id(self, entity_id):
+        pass
