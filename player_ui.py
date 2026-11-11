@@ -160,3 +160,6 @@ class PlayerUI:
             p.draw_rectangle(CRAFT_X + 293, CRAFT_TOP - 251, CRAFT_X + 414, CRAFT_TOP - 222,
                              *((111, 90, 53) if enabled else (60, 63, 65)), filled=True)
             self.text(CRAFT_X + 326, CRAFT_TOP - 237, "제작" if enabled else "재료 부족")
+
+    def click_ally(self, world, x, y, button):
+        pass
