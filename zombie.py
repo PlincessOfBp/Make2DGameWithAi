@@ -62,28 +62,7 @@ class Zombie:
         elif self.state == "ally":
             self.update_ally(world, player, dt)
         else:
-            targets = [player, *(z for z in world.zombies if z.state in ("ally", "fleeing"))]
-            target = min(targets, key=lambda actor: hypot(actor.x - self.x, actor.y - self.y))
-            distance = hypot(target.x - self.x, target.y - self.y)
-            if distance <= 31 and world.pickup_path_clear(self.x, self.y, target.x, target.y):
-                self.walk_time = 0.0
-                self.angle = atan2(target.y - self.y, target.x - self.x) - pi / 2
-                if world.resource_time >= self.next_hit:
-                    if target is player:
-                        player.take_damage(5, world.resource_time)
-                    else:
-                        target.health = max(0, target.health - 5)
-                    if target is not player:
-                        if target.health == 0:
-                            target.state = "dead"
-                        else:
-                            target.hurt_until = world.resource_time + 0.16
-                    self.next_hit = world.resource_time + 2
-                    self.attack_until = world.resource_time + 0.24
-            elif distance <= 280:
-                self.move_toward(world, target.x, target.y, dt, self.speed, 27)
-            else:
-                self.walk_time = 0.0
+            self.hunt(world, player, dt)
 
     def set_command(self, world, command):
         self.command_target = world.attack_target if command == "attack" else None
