@@ -27,3 +27,7 @@ class PlayMode:
 
     def exit(self):
         self.images.clear()
+
+
+    def handle_events(self, events):
+        pass
