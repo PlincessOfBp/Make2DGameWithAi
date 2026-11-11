@@ -231,9 +231,11 @@ class World:
             )
 
     def ally_at(self, player, x, y):
+        current_building = self.building_at(player.x, player.y)
         candidates = [z for z in self.zombies if z.state == "ally"
                       and hypot(z.x - x, z.y - y) <= 23
                       and hypot(z.x - player.x, z.y - player.y) <= 90
+                      and self.building_at(z.x, z.y) in (None, current_building)
                       and self.pickup_path_clear(player.x, player.y, z.x, z.y)]
         return min(candidates, key=lambda z: hypot(z.x - x, z.y - y), default=None)
 
