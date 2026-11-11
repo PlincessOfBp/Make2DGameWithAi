@@ -27,6 +27,8 @@ class Inventory:
             return
         if slot is None:
             slot = self.selected
+        if slot is None:
+            return
         if item in self.slots:
             previous = self.slots.index(item)
             self.slots[previous] = self.slots[slot]
