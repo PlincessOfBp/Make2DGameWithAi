@@ -200,10 +200,7 @@ class World:
             return
         _, zombie, position = min(hits, key=lambda hit: hit[0])
         if zombie is None:
-            self.trees.remove(position)
-            self.walls.remove(self.tree_walls[position])
-            self.tree_respawns[position] = self.resource_time + TREE_RESPAWN_SECONDS
-            player.inventory.add("wood")
+            self.harvest_tree(player, position)
         elif action == "bite":
             zombie.purify_at = self.resource_time + 10
             player.infection = min(100, player.infection + 10)
