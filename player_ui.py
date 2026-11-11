@@ -66,3 +66,6 @@ class PlayerUI:
             elif 293 <= dx <= 414 and 222 <= dy <= 251:
                 inventory.craft(self.recipe)
         return True
+
+    def text(self, x, y, value, color=(248, 239, 218)):
+        pass
