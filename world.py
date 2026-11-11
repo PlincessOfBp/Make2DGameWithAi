@@ -260,3 +260,6 @@ class World:
                 self.pickups[pickup_id] = (item, x, y, building)
                 return True
         return False
+
+    def hit_tree(self, position, weapon):
+        pass
