@@ -64,4 +64,28 @@ class Zombie:
         self.command = command
 
     def update_ally(self, world, player, dt):
-        pass
+        if self.command == "follow":
+            self.move_toward(world, player.x, player.y, dt, 215, 55)
+        elif self.command == "attack":
+            target = self.command_target
+            if target is None or target.state != "zombie":
+                self.set_command(world, "wait")
+            elif hypot(target.x - self.x, target.y - self.y) > 31:
+                self.move_toward(world, target.x, target.y, dt, 215, 27)
+                return
+            elif world.pickup_path_clear(self.x, self.y, target.x, target.y):
+                if world.resource_time >= self.next_hit:
+                    world.hit_zombie(target, 5)
+                    self.next_hit = world.resource_time + 2
+                    self.attack_until = world.resource_time + 0.24
+            self.walk_time = 0.0
+        elif self.command in ("wood", "stone"):
+            self.gather(world, player, dt)
+        else:
+            self.walk_time = 0.0
+            if self.health > 15:
+                return
+            threat = min((z for z in world.zombies if z.state == "zombie"),
+                         key=lambda z: hypot(z.x - self.x, z.y - self.y), default=None)
+            if threat is not None and hypot(threat.x - self.x, threat.y - self.y) < 160:
+                self.move_toward(world, self.x * 2 - threat.x, self.y * 2 - threat.y, dt, 215, 0)
