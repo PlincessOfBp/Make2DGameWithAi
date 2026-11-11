@@ -60,6 +60,7 @@ class PlayMode:
                     self.player.inventory.selected = event.key - p.SDLK_1
                 elif event.key == p.SDLK_i:
                     self.ui.ally = None
+                    self.ui.dragged_item = None
                     self.ui.page = "inventory" if self.ui.page is None else None
                 elif (self.ui.page is None and self.ui.ally is None
                       and event.key in (p.SDLK_e, p.SDLK_b)):
