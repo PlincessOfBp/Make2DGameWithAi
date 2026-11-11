@@ -1,3 +1,4 @@
+from math import cos, sin
 from pathlib import Path
 
 import pico2d as p
@@ -19,7 +20,8 @@ class PlayMode:
         self.camera = self.world.camera(self.player.x, self.player.y)
         self.images = {}
         paths = {"world/ground.png", "characters/player.png"}
-        for kind, *_ in self.world.buildings:
+        for kind, x, y, *_ in self.world.buildings:
+            paths.update(f"world/props/{name}.png" for name, _, _ in self.world.furniture[x, y])
             for layer in ("interior", "roof"):
                 paths.add(f"world/buildings/{kind}_{layer}.png")
         for path in sorted(paths):
@@ -28,10 +30,8 @@ class PlayMode:
             except OSError:
                 self.images[path] = None
 
-
     def exit(self):
         self.images.clear()
-
 
     def handle_events(self, events):
         for event in events:
@@ -41,7 +41,6 @@ class PlayMode:
                 self.keys.discard(event.key)
             elif event.type == p.SDL_MOUSEMOTION:
                 self.mouse = (event.x, SCREEN_HEIGHT - 1 - event.y)
-
 
     def update(self, dt):
         horizontal = (p.SDLK_d in self.keys) - (p.SDLK_a in self.keys)
@@ -53,7 +52,6 @@ class PlayMode:
             cam_x, cam_y = self.camera
             self.player.aim(mouse_x + cam_x, mouse_y + cam_y, dt)
 
-
     def draw(self):
         cam_x, cam_y = self.camera
         ground = self.images["world/ground.png"]
@@ -62,15 +60,17 @@ class PlayMode:
                              SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
         else:
             p.draw_rectangle(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, 91, 112, 75, filled=True)
-        self.draw_buildings()
+        self.draw_buildings(interiors=True)
         self.draw_player()
+        self.draw_buildings(interiors=False)
 
-
-    def draw_buildings(self):
+    def draw_buildings(self, interiors):
         cam_x, cam_y = self.camera
         for kind, x, y, width, height, footprint in self.world.buildings:
             indoors = any(left <= self.player.x <= right and bottom <= self.player.y <= top
                           for left, bottom, right, top in footprint)
+            if indoors != interiors:
+                continue
             layer = "interior" if indoors else "roof"
             image = self.images[f"world/buildings/{kind}_{layer}.png"]
             if image is not None:
@@ -79,6 +79,11 @@ class PlayMode:
                 for left, bottom, right, top in footprint:
                     p.draw_rectangle(left - cam_x, bottom - cam_y, right - cam_x, top - cam_y,
                                      100, 80, 68, filled=True)
+            if indoors:
+                for name, px, py in self.world.furniture[x, y]:
+                    prop = self.images[f"world/props/{name}.png"]
+                    if prop is not None:
+                        prop.draw(px - cam_x, py - cam_y)
 
     def draw_player(self):
         cam_x, cam_y = self.camera
@@ -92,8 +97,6 @@ class PlayMode:
             image.clip_composite_draw(frame * 64, source_y, 64, 64,
                                       player.angle, "", x, y, 64, 64)
         else:
-            from math import cos, sin
-
             radius = player.RADIUS
             p.draw_rectangle(x-radius, y-radius, x+radius, y+radius, 60, 140, 220, filled=True)
             p.draw_line(x, y, x-sin(player.angle)*radius, y+cos(player.angle)*radius,
