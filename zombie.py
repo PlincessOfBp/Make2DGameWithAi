@@ -1,7 +1,6 @@
 from math import atan2, hypot, pi
 
 from human_npc import HumanNPC
-from item_data import TREE_DAMAGE
 
 
 SIGHT_RANGE = 280
@@ -27,12 +26,10 @@ class Zombie:
         self.next_hit = 0.0
         self.next_chop = 0.0
         self.purify_at = None
-        self.command = "wait"
-        self.command_target = None
         self.attack_until = 0.0
         self.attack_target = None
         self.hurt_until = 0.0
-        self.human = False
+        self.human = None
         self.last_seen = None
         self.seen_until = 0.0
         self.route = []
@@ -58,91 +55,18 @@ class Zombie:
             self.purify_at = None
             self.state = "ally" if world.random.random() < 0.5 else "fleeing"
             self.health = 50
-            self.human = True
+            self.human = HumanNPC(self)
             self.next_hit = world.resource_time
-        if self.state == "fleeing":
-            edge = 8 if self.x < 1200 else 2392
-            self.move_toward(world, edge, self.y, dt, 190, 0)
-            if self.x == edge:
-                self.state = "escaped"
-        elif self.state == "ally":
-            self.update_ally(world, player, dt)
+            self.hurt_until = 0.0
+            self.human.set_command(world, "wait")
+        if self.human is not None:
+            self.human.update(world, player, dt)
         else:
             self.hunt(world, player, dt)
 
     def set_command(self, world, command):
-        self.command_target = world.attack_target if command == "attack" else None
-        self.command = command
-
-    def update_ally(self, world, player, dt):
-        if self.command == "follow":
-            self.move_toward(world, player.x, player.y, dt, 215, 55)
-        elif self.command == "attack":
-            target = self.command_target
-            if target is None or target.state != "zombie":
-                self.set_command(world, "wait")
-            elif hypot(target.x - self.x, target.y - self.y) > 31:
-                self.move_toward(world, target.x, target.y, dt, 215, 27)
-                return
-            elif world.pickup_path_clear(self.x, self.y, target.x, target.y):
-                if world.resource_time >= self.next_hit:
-                    world.hit_zombie(target, 5)
-                    self.next_hit = world.resource_time + 2
-                    self.attack_until = world.resource_time + 0.24
-            self.walk_time = 0.0
-        elif self.command in ("wood", "stone"):
-            self.gather(world, player, dt)
-        else:
-            self.walk_time = 0.0
-            if self.health > 15:
-                return
-            threat = min((z for z in world.zombies if z.state == "zombie"),
-                         key=lambda z: hypot(z.x - self.x, z.y - self.y), default=None)
-            if threat is not None and hypot(threat.x - self.x, threat.y - self.y) < 160:
-                self.move_toward(world, self.x * 2 - threat.x, self.y * 2 - threat.y, dt, 215, 0)
-
-    def gather(self, world, player, dt):
-        if self.command == "wood":
-            tool = max((item for item in TREE_DAMAGE if player.items.get(item, 0)),
-                       key=TREE_DAMAGE.get, default=None)
-            targets = world.trees if tool is not None else ()
-            if self.command_target is not None and self.command_target not in targets:
-                self.set_command(world, "wait")
-                self.walk_time = 0.0
-                return
-        else:
-            targets = [(x, y) for _, item, x, y in world.visible_pickups(self.x, self.y)
-                       if item == "stone"]
-        if self.command_target not in targets:
-            self.command_target = min(targets, key=lambda t: hypot(t[0] - self.x, t[1] - self.y),
-                                      default=None)
-        if self.command_target is None:
-            self.set_command(world, "wait")
-            return
-        x, y = self.command_target
-        distance = hypot(x - self.x, y - self.y)
-        if distance > 250:
-            self.set_command(world, "wait")
-        elif distance > 35:
-            self.move_toward(world, x, y, dt, 200, 32)
-            if not self.walk_time:
-                self.set_command(world, "wait")
-            return
-        elif self.command == "wood":
-            if distance and not world.pickup_path_clear(
-                self.x, self.y, x - (x - self.x) * 15 / distance, y - (y - self.y) * 15 / distance
-            ):
-                self.set_command(world, "wait")
-            elif world.resource_time >= self.next_chop:
-                self.next_chop = world.resource_time + 0.65
-                if world.hit_tree((x, y), tool):
-                    self.set_command(world, "wait")
-        else:
-            item = world.collect_pickup(self.x, self.y, x, y)
-            if item is not None:
-                player.inventory.add(item)
-            self.set_command(world, "wait")
-        self.walk_time = 0.0
+        if self.state == "ally":
+            self.human.set_command(world, command)
 
     def follow_route(self, world, goal, dt, stop, speed=None):
         speed = self.speed if speed is None else speed
