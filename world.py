@@ -144,11 +144,7 @@ class World:
         nearest = min(candidates, default=None)
         if nearest is None:
             return None
-        _, pickup_id = nearest
-        pickup = self.pickups.pop(pickup_id)
-        if pickup_id.startswith("stone:"):
-            self.stone_respawns[pickup_id] = (self.resource_time + STONE_RESPAWN_SECONDS, pickup)
-        return pickup[0]
+        return self.take_pickup(nearest[1])
 
     def update_resources(self, dt, player_x, player_y):
 
