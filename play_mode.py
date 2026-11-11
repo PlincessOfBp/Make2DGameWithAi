@@ -120,3 +120,6 @@ class PlayMode:
             else:
                 p.draw_rectangle(sx - 9, sy - 8, sx + 9, sy + 16, 105, 73, 40, filled=True)
                 p.draw_rectangle(sx - 40, sy + 16, sx + 40, sy + 80, 66, 105, 46, filled=True)
+
+    def draw_pickups(self):
+        pass
