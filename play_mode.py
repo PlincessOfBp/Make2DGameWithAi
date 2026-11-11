@@ -288,3 +288,6 @@ class PlayMode:
         swing = (player.action_elapsed / 0.36 * 2 - 1) * 1.134 if attacking else 0
         image.clip_composite_draw(WEAPON_COLUMNS[item] * 64, 0 if attacking else 64,
                                   64, 64, angle + swing, "", x, y, 64, 64)
+
+    def draw_tree(self, x, y, hp):
+        pass
