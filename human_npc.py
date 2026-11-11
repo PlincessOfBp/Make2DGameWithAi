@@ -33,6 +33,12 @@ class HumanNPC:
         self.gather_shortfall = 0
         self.gather_blocked_at = None
         self.skipped_resources = set()
+        self.wait_origin = (actor.x, actor.y)
+        self.returning_to_wait = False
+        self.melee_route = []
+        self.melee_target = None
+        self.melee_target_position = None
+        self.melee_retry_at = 0.0
 
     def set_command(self, world, command, amount=1):
         self.command = command
