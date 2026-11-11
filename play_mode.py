@@ -70,6 +70,8 @@ class PlayMode:
                     self.player.start_action("bite", *target)
             elif event.type == p.SDL_MOUSEBUTTONDOWN:
                 x, y = event.x, SCREEN_HEIGHT - 1 - event.y
+                if self.ui.click_ally(self.world, x, y, event.button):
+                    continue
                 if self.ui.click(self.player, x, y, event.button):
                     continue
                 self.mouse = (x, y)
