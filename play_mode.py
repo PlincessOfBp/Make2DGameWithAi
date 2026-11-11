@@ -19,7 +19,10 @@ class PlayMode:
         self.mouse = None
         self.camera = self.world.camera(self.player.x, self.player.y)
         self.images = {}
-        paths = {"world/ground.png", "characters/player.png"}
+        paths = {
+            "world/ground.png", "characters/player.png",
+            "world/props/tree.png", "items/items.png",
+        }
         for kind, x, y, *_ in self.world.buildings:
             paths.update(f"world/props/{name}.png" for name, _, _ in self.world.furniture[x, y])
             for layer in ("interior", "roof"):
