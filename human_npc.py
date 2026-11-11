@@ -212,6 +212,9 @@ class HumanNPC:
             self.flee(world, dt)
         elif actor.advance_attack(world, player):
             return
+        elif self.protect(world, dt):
+            self.gather_pending = False
+            self.gather_until = 0.0
         elif self.command == "follow":
             target = world.attack_target
             if (target is not None and target.state == "zombie"
@@ -233,7 +236,7 @@ class HumanNPC:
             self.return_to_origin(world, dt)
         elif world.resource_time >= self.gather_until:
             self.tool = None
-            self.protect(world, dt)
+            actor.walk_time = 0.0
 
     def take_gathered(self, player):
         if not self.can_take_gathered():
