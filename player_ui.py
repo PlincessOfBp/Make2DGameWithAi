@@ -70,3 +70,6 @@ class PlayerUI:
     def text(self, x, y, value, color=(248, 239, 218)):
         if self.font is not None:
             self.font.draw(x, y, value, color)
+
+    def panel(self, images, name, x, top, width, height):
+        pass
