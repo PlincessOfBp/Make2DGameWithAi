@@ -217,18 +217,11 @@ class PlayMode:
             return
         attacking = player.action == "attack"
         item = player.action_weapon if attacking else player.inventory.selected_item()
-        image = self.images["items/weapons.png"]
-        if item not in WEAPON_COLUMNS or image is None:
-            return
         frame = min(int(player.action_elapsed / 0.12), 2)
         hand_y = (4, 16, 7)[frame] if attacking else 0
-        angle = player.angle
         cam_x, cam_y = self.camera
-        x = round(player.x - cam_x + 12 * cos(angle) - hand_y * sin(angle))
-        y = round(player.y - cam_y + 12 * sin(angle) + hand_y * cos(angle))
-        swing = (player.action_elapsed / 0.36 * 2 - 1) * 1.134 if attacking else 0
-        image.clip_composite_draw(WEAPON_COLUMNS[item] * 64, 0 if attacking else 64,
-                                  64, 64, angle + swing, "", x, y, 64, 64)
+        swing = (player.action_elapsed / 0.36 * 2 - 1) * 1.134 if attacking else None
+        self.draw_held_weapon(item, player.angle, player.x - cam_x, player.y - cam_y, hand_y, swing)
 
     def draw_tree(self, x, y, hp):
         cam_x, cam_y = self.camera
