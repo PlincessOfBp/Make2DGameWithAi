@@ -22,4 +22,19 @@ class World:
 
     def move(self, x, y, dx, dy, radius):
         # Sweep each axis separately so the actor can slide along a wall.
-        pass
+        next_x = min(max(x + dx, radius), MAP_WIDTH - radius)
+        for left, bottom, right, top in self.walls:
+            if bottom - radius < y < top + radius:
+                if x <= left - radius:
+                    next_x = min(next_x, left - radius)
+                elif x >= right + radius:
+                    next_x = max(next_x, right + radius)
+
+        next_y = min(max(y + dy, radius), MAP_HEIGHT - radius)
+        for left, bottom, right, top in self.walls:
+            if left - radius < next_x < right + radius:
+                if y <= bottom - radius:
+                    next_y = min(next_y, bottom - radius)
+                elif y >= top + radius:
+                    next_y = max(next_y, top + radius)
+        return next_x, next_y
