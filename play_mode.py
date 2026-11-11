@@ -35,3 +35,7 @@ class PlayMode:
 
     def update(self, dt):
         pass
+
+
+    def draw(self):
+        pass
