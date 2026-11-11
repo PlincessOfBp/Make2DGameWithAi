@@ -17,6 +17,8 @@ class PlayMode:
     def enter(self):
         self.world = World()
         self.player = Player()
+        self.ui = PlayerUI()
+        self.ui.load_font()
         self.keys = set()
         self.mouse = None
         self.camera = self.world.camera(self.player.x, self.player.y)
