@@ -200,3 +200,6 @@ class HumanNPC:
             player.inventory.add(item, count)
         self.inventory.items.clear()
         return True
+
+    def begin_return(self):
+        pass
