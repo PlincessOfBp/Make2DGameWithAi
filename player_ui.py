@@ -48,9 +48,11 @@ class PlayerUI:
         left_click = button == p.SDL_BUTTON_LEFT
         if HOTBAR_X <= x < HOTBAR_X + 282 and HOTBAR_TOP - 64 < y <= HOTBAR_TOP:
             if left_click:
-                dx, dy = x - HOTBAR_X - 9, HOTBAR_TOP - y - 8
-                if 0 <= dx < 5 * 54 and dx % 54 < 48 and 0 <= dy < 48:
-                    inventory.selected = dx // 54
+                slot = self.hotbar_slot_at(x, y)
+                if slot is not None:
+                    inventory.selected = slot
+                    if self.page == "inventory":
+                        self.dragged_item = inventory.slots[slot]
             return True
         if self.page is None:
             return False
