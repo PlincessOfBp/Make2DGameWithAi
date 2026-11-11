@@ -196,3 +196,6 @@ class PlayerUI:
             p.draw_rectangle(ALLY_LEFT + 26, top - 28, ALLY_LEFT + 294, top,
                              64, 66, 65, filled=True)
             self.text(ALLY_LEFT + 40, top - 14, label)
+
+    def hotbar_slot_at(self, x, y):
+        pass
