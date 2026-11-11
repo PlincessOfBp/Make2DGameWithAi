@@ -63,4 +63,16 @@ class Player:
             self.action = None
 
     def use_selected(self, world):
-        pass
+        item = self.inventory.slots[self.inventory.selected]
+        if item == "canned_food" and (self.health < 100 or self.infection > 0):
+            self.health = min(100, self.health + 30)
+            self.infection = max(0, self.infection - 20)
+        elif item == "barricade":
+            x = round(self.x - sin(self.target_angle) * 64)
+            y = round(self.y + cos(self.target_angle) * 64)
+            if not world.place_barricade(self, x, y):
+                return False
+        else:
+            return False
+        self.inventory.remove(item)
+        return True
