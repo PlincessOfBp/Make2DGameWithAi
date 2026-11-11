@@ -38,6 +38,9 @@ class HumanNPC:
         self.skipped_resources = set()
         self.wait_origin = (actor.x, actor.y)
         self.returning_to_wait = False
+        self.follow_escape_enemy = None
+        self.follow_escape_seen_at = 0.0
+        self.follow_retreat_goal = None
         self.melee_route = []
         self.melee_target = None
         self.melee_target_position = None
