@@ -62,6 +62,7 @@ class PlayerUI:
             if 250 <= x < 395:
                 self.page = "inventory"
             elif 405 <= x < 550:
+                self.dragged_item = None
                 self.page = "craft"
         elif self.page == "inventory":
             dx, dy = x - INVENTORY_X - 16, INVENTORY_TOP - y - 49
