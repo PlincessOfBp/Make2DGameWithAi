@@ -11,3 +11,7 @@ class World:
             footprint = tuple((left+a, bottom+b, left+c, bottom+d) for a, b, c, d in rooms)
             self.buildings.append((kind, x, y, width, height, footprint))
             self.walls.extend((left+a, bottom+b, left+c, bottom+d) for a, b, c, d in walls)
+
+
+    def camera(self, x, y):
+        pass
