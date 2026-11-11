@@ -11,3 +11,6 @@ class Inventory:
         self.items[item] = self.items.get(item, 0) + 1
         if item in HOTBAR_ITEMS and item not in self.slots and None in self.slots:
             self.slots[self.slots.index(None)] = item
+
+    def remove(self, item, count=1):
+        pass
