@@ -6,4 +6,6 @@ class Player:
     RADIUS = 8
     TURN_RESPONSE = 14
     WALK_FPS = 10
-    pass
+
+    def __init__(self):
+        pass
