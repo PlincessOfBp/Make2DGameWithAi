@@ -209,3 +209,6 @@ class HumanNPC:
         self.actor.route.clear()
         self.actor.route_goal = None
         self.actor.next_route_at = 0.0
+
+    def return_to_origin(self, world, dt):
+        pass
