@@ -102,7 +102,7 @@ class HumanNPC:
             self.destination = None
             self.escape_retry_at = world.resource_time + 0.4
 
-    def protect(self, world, dt):
+    def protect(self, world, dt, player=None):
         actor = self.actor
         low_health = actor.health <= 15
         detection_range = 160 if low_health else 31
@@ -114,6 +114,15 @@ class HumanNPC:
             and world.pickup_path_clear(actor.x, actor.y, npc.x, npc.y)
         )
         nearest = min(visible_threats, default=None)
+        following_retreat = self.command == "follow" and low_health and player is not None
+        if following_retreat:
+            nearest, hold = self.follow_escape(world, player, nearest)
+            if hold:
+                actor.walk_time = 0.0
+                return True
+        else:
+            self.follow_escape_enemy = None
+            self.follow_retreat_goal = None
         if self.command == "wait":
             from_origin = hypot(actor.x - self.wait_origin[0], actor.y - self.wait_origin[1])
             if from_origin >= WAIT_RETREAT_LIMIT or (nearest is None and from_origin > 0.5):
@@ -245,7 +254,7 @@ class HumanNPC:
             self.flee(world, dt)
         elif actor.advance_attack(world, player):
             return
-        elif self.protect(world, dt):
+        elif self.protect(world, dt, player):
             self.melee_route.clear()
             self.gather_pending = False
             self.gather_until = 0.0
