@@ -338,4 +338,7 @@ class World:
         return pickup[0]
 
     def can_command_ally(self, player, ally):
-        pass
+        return (ally.state == "ally"
+                and hypot(ally.x - player.x, ally.y - player.y) <= 90
+                and self.building_at(ally.x, ally.y) in (None, self.building_at(player.x, player.y))
+                and self.pickup_path_clear(player.x, player.y, ally.x, ally.y))
