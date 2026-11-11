@@ -32,3 +32,6 @@ class Inventory:
     def can_craft(self, item):
         return item in RECIPES and all(self.items.get(material, 0) >= count
                                        for material, count in RECIPES[item].items())
+
+    def craft(self, item):
+        pass
