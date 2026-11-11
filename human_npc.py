@@ -106,9 +106,19 @@ class HumanNPC:
             and world.pickup_path_clear(actor.x, actor.y, npc.x, npc.y)
         )
         nearest = min(visible_threats, default=None)
+        if self.command == "wait":
+            from_origin = hypot(actor.x - self.wait_origin[0], actor.y - self.wait_origin[1])
+            if from_origin >= WAIT_RETREAT_LIMIT or (nearest is None and from_origin > 0.5):
+                self.returning_to_wait = True
+            # An enemy already in melee range must be dealt with before walking back.
+            if self.returning_to_wait and (nearest is None or nearest[0] > 31):
+                return self.return_to_wait(world, dt)
         if nearest is None:
             return False
         distance, _, threat = nearest
+        if self.returning_to_wait and distance <= 31:
+            actor.start_attack(threat, world.resource_time)
+            return True
         if low_health:
             heading = atan2(actor.y - threat.y, actor.x - threat.x)
             candidates = [
