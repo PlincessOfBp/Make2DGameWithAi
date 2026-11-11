@@ -26,3 +26,6 @@ class Zombie:
         position = world.move(self.x, self.y, dx * step, dy * step, 8)
         self.walk_time = self.walk_time + dt if position != (self.x, self.y) else 0.0
         self.x, self.y = position
+
+    def update(self, world, player, dt):
+        pass
