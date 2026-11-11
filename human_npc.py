@@ -290,3 +290,6 @@ class HumanNPC:
 
     def can_take_gathered(self):
         return self.command not in ("wood", "stone", "return") and bool(self.inventory.items)
+
+    def return_to_wait(self, world, dt):
+        pass
