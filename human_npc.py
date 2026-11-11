@@ -241,4 +241,4 @@ class HumanNPC:
             actor.follow_route(world, (target.x, target.y), dt, 27, speed=215)
 
     def can_take_gathered(self):
-        pass
+        return self.command not in ("wood", "stone", "return") and bool(self.inventory.items)
