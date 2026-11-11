@@ -324,4 +324,4 @@ class World:
         return []
 
     def actor_by_id(self, entity_id):
-        pass
+        return next((actor for actor in self.zombies if actor.entity_id == entity_id), None)
