@@ -79,7 +79,8 @@ class Player:
         return True
 
     def take_damage(self, damage, now):
-        pass
+        self.health = max(0, self.health - damage)
+        self.hurt_until = now + 0.16 if self.health else 0.0
 
     def drop_selected(self, world):
         item = self.inventory.slots[self.inventory.selected]
