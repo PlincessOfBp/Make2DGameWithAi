@@ -44,7 +44,14 @@ class PlayMode:
 
 
     def update(self, dt):
-        pass
+        horizontal = (p.SDLK_d in self.keys) - (p.SDLK_a in self.keys)
+        vertical = (p.SDLK_w in self.keys) - (p.SDLK_s in self.keys)
+        self.player.move(self.world, horizontal, vertical, dt)
+        self.camera = self.world.camera(self.player.x, self.player.y)
+        if self.mouse is not None:
+            mouse_x, mouse_y = self.mouse
+            cam_x, cam_y = self.camera
+            self.player.aim(mouse_x + cam_x, mouse_y + cam_y, dt)
 
 
     def draw(self):
