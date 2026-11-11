@@ -215,3 +215,6 @@ class PlayerUI:
             inventory.assign(item, slot)
         elif INVENTORY_X <= x < INVENTORY_X + 350 and INVENTORY_TOP - 258 < y <= INVENTORY_TOP:
             inventory.unassign(item)
+
+    def draw_drag(self, images, player, pointer):
+        pass
