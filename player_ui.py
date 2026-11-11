@@ -217,4 +217,12 @@ class PlayerUI:
             inventory.unassign(item)
 
     def draw_drag(self, images, player, pointer):
-        pass
+        if self.dragged_item is None or pointer is None:
+            return
+        x, y = pointer
+        slot = self.hotbar_slot_at(x, y)
+        if slot is not None:
+            left = HOTBAR_X + 9 + slot * 54
+            top = HOTBAR_TOP - 8
+            p.draw_rectangle(left, top - 48, left + 48, top, 247, 210, 127)
+        self.icon(images, self.dragged_item, x, y, player.inventory.items[self.dragged_item])
