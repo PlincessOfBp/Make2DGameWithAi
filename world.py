@@ -75,17 +75,7 @@ class World:
 
 
     def move(self, x, y, dx, dy, radius, actor=None):
-        obstacles = self.walls
-        if actor is not None:
-            bodies = (self.player, *self.zombies)
-            obstacles = self.walls + [
-                (body.x - body.RADIUS, body.y - body.RADIUS,
-                 body.x + body.RADIUS, body.y + body.RADIUS)
-                for body in bodies
-                if body is not None and body is not actor
-                and getattr(body, "state", None) not in ("dead", "escaped")
-                and body.health > 0
-            ]
+        obstacles = self.collision_obstacles(actor)
 
         # Sweep each axis separately so the actor can slide along solid objects.
         next_x = min(max(x + dx, radius), MAP_WIDTH - radius)
