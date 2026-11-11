@@ -83,9 +83,14 @@ class PlayMode:
         self.draw_buildings(interiors=True)
         self.draw_pickups()
         self.draw_trees(foreground=False)
+        self.draw_actors()
         self.draw_player()
+        self.draw_weapon()
         self.draw_trees(foreground=True)
         self.draw_buildings(interiors=False)
+        remaining = sum(z.state == "zombie" for z in self.world.zombies)
+        self.ui.draw_hud(self.images, self.player, remaining)
+        self.ui.draw_window(self.images, self.player)
 
     def draw_buildings(self, interiors):
         cam_x, cam_y = self.camera
