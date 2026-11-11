@@ -54,7 +54,10 @@ class Zombie:
                 self.walk_time = 0.0
                 self.angle = atan2(target.y - self.y, target.x - self.x) - pi / 2
                 if world.resource_time >= self.next_hit:
-                    target.health = max(0, target.health - 5)
+                    if target is player:
+                        player.take_damage(5, world.resource_time)
+                    else:
+                        target.health = max(0, target.health - 5)
                     if target is not player and target.health == 0:
                         target.state = "dead"
                     self.next_hit = world.resource_time + 2
