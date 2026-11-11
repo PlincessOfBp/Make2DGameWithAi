@@ -17,6 +17,7 @@ class Player:
         self.inventory = Inventory()
         self.items = self.inventory.items
         self.health = 100
+        self.hurt_until = 0.0
         self.infection = 0.0
         self.action = None
         self.action_elapsed = 0.0
