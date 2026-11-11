@@ -104,4 +104,49 @@ class HumanNPC:
         return False
 
     def gather(self, world, player, dt):
-        pass
+        actor = self.actor
+        if self.target is None and not self.choose_resource(world, player):
+            self.set_command(world, "wait")
+            return
+        wood = self.command == "wood"
+        if wood:
+            if self.target not in world.trees or self.tool not in player.items:
+                self.set_command(world, "wait")
+                return
+            x, y = self.target
+            end_x, end_y = (self.destination[0] + x) / 2, (self.destination[1] + y) / 2
+        else:
+            pickup = world.pickups.get(self.target)
+            if pickup is None:
+                self.set_command(world, "wait")
+                return
+            _, x, y, _ = pickup
+            end_x, end_y = x, y
+        close = hypot(x - actor.x, y - actor.y) <= GATHER_REACH
+        clear = close and world.pickup_path_clear(actor.x, actor.y, end_x, end_y)
+        now = world.resource_time
+        if self.gather_pending and now >= self.gather_until - GATHER_FRAME_TIME - 1e-9:
+            self.gather_pending = False
+            if clear:
+                if wood:
+                    if world.hit_tree(self.target, self.tool):
+                        self.target = None
+                        self.command = "wait"
+                else:
+                    item = world.take_pickup(self.target)
+                    if item is not None:
+                        player.inventory.add(item)
+                    self.target = None
+                    self.command = "wait"
+        if now < self.gather_until:
+            actor.walk_time = 0.0
+        elif not clear:
+            actor.follow_route(world, self.destination, dt, 0, speed=200)
+        elif now >= actor.next_chop:
+            actor.walk_time = 0.0
+            actor.angle = atan2(y - actor.y, x - actor.x) - pi / 2
+            self.gather_pending = True
+            self.gather_until = now + GATHER_FRAME_TIME * 2
+            actor.next_chop = now + 0.65
+        else:
+            actor.walk_time = 0.0
