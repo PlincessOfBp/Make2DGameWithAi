@@ -121,7 +121,7 @@ class PlayerUI:
             y = HOTBAR_TOP - 32
             if index == inventory.selected:
                 self.panel(images, "slot_selected", x - 24, y + 24, 48, 48)
-            if item is not None:
+            if item is not None and item != self.dragged_item:
                 self.icon(images, item, x, y, inventory.items[item])
             self.text(x - 20, y + 16, str(index + 1))
 
