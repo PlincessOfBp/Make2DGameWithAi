@@ -31,6 +31,7 @@ class HumanNPC:
         self.tool = None
         self.inventory = Inventory()
         self.following = False
+        self.supporting_attack = False
         self.gather_remaining = 0
         self.gather_origin = None
         self.gather_shortfall = 0
@@ -48,6 +49,7 @@ class HumanNPC:
 
     def set_command(self, world, command, amount=1):
         self.command = command
+        self.supporting_attack = False
         if command == "wait":
             self.wait_origin = (self.actor.x, self.actor.y)
         self.returning_to_wait = False
@@ -102,7 +104,7 @@ class HumanNPC:
             self.destination = None
             self.escape_retry_at = world.resource_time + 0.4
 
-    def protect(self, world, dt, player=None):
+    def protect(self, world, dt, player=None, support_target=None):
         actor = self.actor
         low_health = actor.health <= 15
         detection_range = 160 if low_health else 31
@@ -160,6 +162,7 @@ class HumanNPC:
                     self.follow_retreat_goal = goal if actor.walk_time else None
                 return True
         if distance <= 31:
+            self.supporting_attack = threat is support_target
             actor.start_attack(threat, world.resource_time)
             return True
         actor.walk_time = 0.0
@@ -264,19 +267,27 @@ class HumanNPC:
         actor = self.actor
         if actor.state == "fleeing":
             self.flee(world, dt)
-        elif actor.advance_attack(world, player):
             return
-        elif self.protect(world, dt, player):
+        if actor.advance_attack(world, player):
+            return
+
+        self.supporting_attack = False
+        target = world.attack_target
+        support_target = target if (
+            self.command == "follow" and actor.health > 15
+            and target is not None and target.state == "zombie"
+            and world.resource_time - world.attack_target_at <= ASSIST_MEMORY
+            and hypot(actor.x - player.x, actor.y - player.y) <= ASSIST_RANGE
+            and hypot(target.x - player.x, target.y - player.y) <= ASSIST_RANGE
+        ) else None
+        if self.protect(world, dt, player, support_target):
             self.melee_route.clear()
             self.gather_pending = False
             self.gather_until = 0.0
         elif self.command == "follow":
-            target = world.attack_target
-            if (actor.health > 15 and target is not None and target.state == "zombie"
-                    and world.resource_time - world.attack_target_at <= ASSIST_MEMORY
-                    and hypot(actor.x - player.x, actor.y - player.y) <= ASSIST_RANGE
-                    and hypot(target.x - player.x, target.y - player.y) <= ASSIST_RANGE):
-                self.fight(world, target, dt)
+            if support_target is not None:
+                self.supporting_attack = True
+                self.fight(world, support_target, dt)
             else:
                 self.melee_route.clear()
                 self.melee_target = None

@@ -221,7 +221,9 @@ class PlayerUI:
         if self.gather_menu:
             self.text(366, 308, f"수량  {self.gather_amount}")
         else:
-            if human.command in ("wood", "stone"):
+            if human.supporting_attack:
+                status = "공동 공격 중"
+            elif human.command in ("wood", "stone"):
                 status = f"채집 중  ·  남은 수량 {human.gather_remaining}"
             elif human.gather_shortfall and human.command in ("return", "wait"):
                 suffix = "복귀 중" if human.command == "return" else "복귀 완료"
