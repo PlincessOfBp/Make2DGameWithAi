@@ -198,4 +198,7 @@ class PlayerUI:
             self.text(ALLY_LEFT + 40, top - 14, label)
 
     def hotbar_slot_at(self, x, y):
-        pass
+        dx, dy = x - HOTBAR_X - 9, HOTBAR_TOP - y - 8
+        if 0 <= dx < 5 * 54 and dx % 54 < 48 and 0 <= dy < 48:
+            return dx // 54
+        return None
