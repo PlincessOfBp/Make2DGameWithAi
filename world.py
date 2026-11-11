@@ -87,4 +87,8 @@ class World:
         return None
 
     def visible_pickups(self, x, y):
-        pass
+
+        building = self.building_at(x, y)
+        for pickup_id, (item, px, py, location) in self.pickups.items():
+            if location is None or location == building:
+                yield pickup_id, item, px, py
