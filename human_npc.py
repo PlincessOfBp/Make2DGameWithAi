@@ -81,25 +81,35 @@ class HumanNPC:
 
     def protect(self, world, dt):
         actor = self.actor
-        if actor.health > 15:
-            actor.walk_time = 0.0
-            return
-        threat = min((npc for npc in world.zombies if npc.state == "zombie"),
-                     key=lambda npc: hypot(npc.x - actor.x, npc.y - actor.y), default=None)
-        if threat is None or hypot(threat.x - actor.x, threat.y - actor.y) >= 160:
-            actor.walk_time = 0.0
-            return
-        heading = atan2(actor.y - threat.y, actor.x - threat.x)
-        candidates = [
-            world.move(actor.x, actor.y, cos(heading + turn * tau / 8) * 30,
-                       sin(heading + turn * tau / 8) * 30, 8)
-            for turn in range(8)
-        ]
-        x, y = max(candidates, key=lambda point: hypot(point[0] - threat.x, point[1] - threat.y))
-        if hypot(x - threat.x, y - threat.y) > hypot(actor.x - threat.x, actor.y - threat.y):
-            actor.move_toward(world, x, y, dt, 215, 0)
-        else:
-            actor.walk_time = 0.0
+        low_health = actor.health <= 15
+        detection_range = 160 if low_health else 31
+        visible_threats = (
+            (distance, npc.entity_id, npc)
+            for npc in world.zombies
+            if npc.state == "zombie"
+            and (distance := hypot(npc.x - actor.x, npc.y - actor.y)) <= detection_range
+            and world.pickup_path_clear(actor.x, actor.y, npc.x, npc.y)
+        )
+        nearest = min(visible_threats, default=None)
+        if nearest is None:
+            return False
+        distance, _, threat = nearest
+        if low_health:
+            heading = atan2(actor.y - threat.y, actor.x - threat.x)
+            candidates = [
+                world.move(actor.x, actor.y, cos(heading + turn * tau / 8) * 30,
+                           sin(heading + turn * tau / 8) * 30, actor.RADIUS, actor=actor)
+                for turn in range(8)
+            ]
+            x, y = max(candidates, key=lambda point: hypot(point[0] - threat.x, point[1] - threat.y))
+            if hypot(x - threat.x, y - threat.y) > distance + 0.01:
+                actor.move_toward(world, x, y, dt, 215, 0, steer=False)
+                return True
+        if distance <= 31:
+            actor.start_attack(threat, world.resource_time)
+            return True
+        actor.walk_time = 0.0
+        return True
 
     def choose_resource(self, world):
         actor = self.actor
