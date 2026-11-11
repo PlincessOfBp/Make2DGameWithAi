@@ -260,7 +260,7 @@ class World:
                 return True
         return False
 
-    def hit_tree(self, position, weapon):
+    def hit_tree(self, position, weapon, inventory=None):
         damage = TREE_DAMAGE.get(weapon)
         if damage is None or position not in self.trees:
             return False
