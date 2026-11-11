@@ -210,3 +210,6 @@ class Zombie:
             self.route.clear()
             self.route_goal = None
             self.walk_time = 0.0
+
+    def start_attack(self, target, now):
+        pass
