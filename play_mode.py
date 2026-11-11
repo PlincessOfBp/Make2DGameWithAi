@@ -80,4 +80,20 @@ class PlayMode:
                                      100, 80, 68, filled=True)
 
     def draw_player(self):
-        pass
+        cam_x, cam_y = self.camera
+        player = self.player
+        x, y = round(player.x) - cam_x, round(player.y) - cam_y
+        image = self.images["characters/player.png"]
+        if image is not None:
+            walking = player.walk_time > 0
+            frame = int(player.walk_time * player.WALK_FPS) % 4
+            source_y = 1280 if walking else 1344
+            image.clip_composite_draw(frame * 64, source_y, 64, 64,
+                                      player.angle, "", x, y, 64, 64)
+        else:
+            from math import cos, sin
+
+            radius = player.RADIUS
+            p.draw_rectangle(x-radius, y-radius, x+radius, y+radius, 60, 140, 220, filled=True)
+            p.draw_line(x, y, x-sin(player.angle)*radius, y+cos(player.angle)*radius,
+                        255, 255, 255)
