@@ -74,6 +74,10 @@ class Player:
         if self.action_elapsed >= 0.36:
             self.action = None
 
+    def barricade_position(self):
+        return (round(self.x - sin(self.target_angle) * 64),
+                round(self.y + cos(self.target_angle) * 64))
+
     def use_selected(self, world):
         item = self.inventory.selected_item()
         if item == "canned_food" and (self.health < 100 or self.infection > 0):
@@ -81,9 +85,7 @@ class Player:
             self.infection = max(0, self.infection - 20)
             world.sound("eat")
         elif item == "barricade":
-            x = round(self.x - sin(self.target_angle) * 64)
-            y = round(self.y + cos(self.target_angle) * 64)
-            if not world.place_barricade(self, x, y):
+            if not world.place_barricade(self, *self.barricade_position()):
                 return False
             world.sound("craft")
         else:

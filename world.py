@@ -210,18 +210,24 @@ class World:
                 self.walls.append(wall)
                 del self.tree_respawns[x, y]
 
-    def place_barricade(self, player, x, y):
+    def barricade_blocker(self, player, x, y):
         left, bottom, right, top = x - 29, y - 14, x + 29, y + 14
         if left < 0 or bottom < 0 or right > MAP_WIDTH or top > MAP_HEIGHT:
-            return False
+            return "맵 밖에는 설치할 수 없습니다"
         if any(left < r and right > l and bottom < t and top > b for l, b, r, t in self.walls):
-            return False
+            return "벽이나 장애물과 겹칩니다"
         actors = [player, *(z for z in self.zombies if z.state not in ("dead", "escaped"))]
-        if any(left - 8 < actor.x < right + 8 and bottom - 8 < actor.y < top + 8 for actor in actors):
-            return False
+        if any(left - actor.RADIUS < actor.x < right + actor.RADIUS
+               and bottom - actor.RADIUS < actor.y < top + actor.RADIUS for actor in actors):
+            return "캐릭터와 겹칩니다"
         if any(left <= px <= right and bottom <= py <= top for _, px, py, _ in self.pickups.values()):
+            return "바닥 아이템과 겹칩니다"
+        return None
+
+    def place_barricade(self, player, x, y):
+        if self.barricade_blocker(player, x, y) is not None:
             return False
-        self.walls.append((left, bottom, right, top))
+        self.walls.append((x - 29, y - 14, x + 29, y + 14))
         self.barricades.append((x, y))
         return True
 
