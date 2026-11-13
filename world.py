@@ -65,6 +65,7 @@ class World:
                 self.pickups[f"loot:{index}:{slot}"] = (item, x + dx, y + dy, index)
         self.stone_respawns = {}
         self.drop_ids = count()
+        self.dropped_durability = {}
         self.resource_time = 0.0
 
     def camera(self, x, y):
@@ -105,10 +106,27 @@ class World:
 
     def visible_pickups(self, x, y):
 
-        building = self.building_at(x, y)
+        building = self.revealed_building(x, y)
         for pickup_id, (item, px, py, location) in self.pickups.items():
             if location is None or location == building:
                 yield pickup_id, item, px, py
+
+    def revealed_building(self, x, y):
+        inside = self.building_at(x, y)
+        if inside is not None:
+            return inside
+        for index in range(len(self.buildings)):
+            door_x, threshold = self.building_entrance(index)
+            if abs(x - door_x) <= 24 and 0 <= threshold - y <= 44:
+                return index
+        return None
+
+    def building_entrance(self, index):
+        kind, cx, cy, width, height, _ = self.buildings[index]
+        scale = BUILDING_SCALES.get(kind, 1)
+        image_width = BUILDING_LAYOUTS[kind][0][0]
+        door_x = cx - width // 2 + (70 if kind == "house_corner" else image_width / 2) * scale
+        return door_x, cy - height // 2 + 3 * scale
 
     def pickup_path_clear(self, x, y, target_x, target_y, clearance=0, obstacles=None):
 
@@ -136,12 +154,14 @@ class World:
                 return False
         return True
 
-    def collect_pickup(self, x, y, mouse_x, mouse_y):
+    def collect_pickup(self, x, y, mouse_x, mouse_y, inventory=None):
 
+        building = self.building_at(x, y)
         candidates = (
             (hypot(mouse_x - px, mouse_y - py), pickup_id)
             for pickup_id, _, px, py in self.visible_pickups(x, y)
             if abs(mouse_x - px) <= PICKUP_ICON_HALF_SIZE
+            and self.pickups[pickup_id][3] in (None, building)
             and abs(mouse_y - py) <= PICKUP_ICON_HALF_SIZE
             and hypot(x - px, y - py) <= PICKUP_REACH
             and self.pickup_path_clear(x, y, px, py)
@@ -149,7 +169,12 @@ class World:
         nearest = min(candidates, default=None)
         if nearest is None:
             return None
-        return self.take_pickup(nearest[1])
+        pickup_id = nearest[1]
+        durability = self.dropped_durability.pop(pickup_id, None)
+        item = self.take_pickup(pickup_id)
+        if inventory is not None:
+            inventory.add(item, durability=durability)
+        return item
 
     def update_resources(self, dt, player_x, player_y):
 
@@ -220,6 +245,8 @@ class World:
             self.attack_target = zombie
             self.attack_target_at = self.resource_time
             self.hit_zombie(zombie, WEAPON_DAMAGE[weapon])
+        if action == "attack":
+            player.inventory.wear_tool(weapon)
 
     def hit_zombie(self, zombie, damage):
         if zombie.state != "zombie":
@@ -259,6 +286,8 @@ class World:
                     continue
                 pickup_id = f"drop:{next(self.drop_ids)}"
                 self.pickups[pickup_id] = (item, x, y, building)
+                if item in player.inventory.durability:
+                    self.dropped_durability[pickup_id] = player.inventory.durability[item][0]
                 return True
         return False
 
@@ -343,6 +372,10 @@ class World:
                 and hypot(ally.x - player.x, ally.y - player.y) <= 90
                 and self.building_at(ally.x, ally.y) in (None, self.building_at(player.x, player.y))
                 and self.pickup_path_clear(player.x, player.y, ally.x, ally.y))
+
+    def nearby_allies(self, player):
+        return tuple(actor for actor in self.zombies if actor.state == "ally"
+                     and hypot(actor.x - player.x, actor.y - player.y) <= 260)
 
     def collision_obstacles(self, actor=None):
         if actor is None:

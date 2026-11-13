@@ -302,9 +302,48 @@ class HumanNPC:
             self.gather(world, dt)
         elif self.command == "return":
             self.return_to_origin(world, dt)
+        elif self.command == "spread":
+            self.spread_out(world, player, dt)
         elif world.resource_time >= self.gather_until:
             self.tool = None
             actor.walk_time = 0.0
+
+    def spread_out(self, world, player, dt):
+        actor = self.actor
+        start = (actor.x, actor.y)
+        if self.destination is None:
+            room = world.building_at(*start)
+            anchor_x, anchor_y = start
+            heading = atan2(actor.y - player.y, actor.x - player.x)
+            if room is not None:
+                anchor_x, anchor_y = world.building_entrance(room)
+                heading = -pi / 2
+            side = 1 if actor.entity_id % 2 == 0 else -1
+            for turn in (side, -side, 0, 2 * side, -2 * side, 3, -3, 4):
+                angle = heading + turn * pi / 8
+                goal = (anchor_x + cos(angle) * 110, anchor_y + sin(angle) * 110)
+                if (not all(actor.RADIUS <= value <= limit - actor.RADIUS
+                            for value, limit in zip(goal, (MAP_WIDTH, MAP_HEIGHT)))
+                        or world.building_at(*goal) is not None
+                        or not world.pickup_path_clear(*goal, *goal, actor.RADIUS,
+                                                       world.collision_obstacles(actor))
+                        or any(npc is not actor and npc.state == "ally" and npc.human.command == "spread"
+                               and npc.human.destination is not None
+                               and hypot(goal[0] - npc.human.destination[0],
+                                         goal[1] - npc.human.destination[1]) < 32
+                               for npc in world.zombies)):
+                    continue
+                route = world.find_route(start, goal, actor.RADIUS)
+                if route:
+                    self.destination = goal
+                    actor.route, actor.route_goal = route, goal
+                    break
+        if self.destination is None:
+            self.set_command(world, "wait")
+            return
+        actor.follow_route(world, self.destination, dt, 0, speed=200)
+        if hypot(actor.x - self.destination[0], actor.y - self.destination[1]) < 1:
+            self.set_command(world, "wait")
 
     def take_gathered(self, player):
         if not self.can_take_gathered():

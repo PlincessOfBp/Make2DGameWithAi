@@ -4,7 +4,7 @@ from pathlib import Path
 import pico2d as p
 
 from human_npc import GATHER_LIMIT
-from item_data import ITEM_ICON_CELLS, ITEM_NAMES, RECIPES
+from item_data import ITEM_ICON_CELLS, ITEM_NAMES, RECIPES, TOOL_DURABILITY
 
 
 HOTBAR_X, HOTBAR_TOP = 259, 68
@@ -24,6 +24,7 @@ class PlayerUI:
         self.font = None
         self.result = None
         self.ally = None
+        self.group_command = False
         self.gather_menu = False
         self.gather_resource = "wood"
         self.gather_amount = 1
@@ -123,6 +124,12 @@ class PlayerUI:
                 self.panel(images, "slot_selected", x - 24, y + 24, 48, 48)
             if item is not None and item != self.dragged_item:
                 self.icon(images, item, x, y, inventory.items[item])
+                if item in inventory.durability:
+                    ratio = inventory.durability[item][0] / TOOL_DURABILITY[item]
+                    width = max(1, round(32 * ratio))
+                    color = (100, 187, 120) if ratio > 0.25 else (225, 112, 68)
+                    p.draw_rectangle(x - 16, y - 21, x + 15, y - 18, 40, 42, 42, filled=True)
+                    p.draw_rectangle(x - 16, y - 21, x - 17 + width, y - 18, *color, filled=True)
             self.text(x - 20, y + 16, str(index + 1))
 
     def draw_window(self, images, player):
@@ -167,13 +174,18 @@ class PlayerUI:
             self.text(CRAFT_X + 326, CRAFT_TOP - 237, "제작" if enabled else "재료 부족")
 
     def click_ally(self, world, x, y, button, player):
-        if self.ally is None:
+        if self.group_command:
+            allies = world.nearby_allies(player)
+        elif self.ally is None:
             return False
-        if not world.can_command_ally(player, self.ally):
+        elif not world.can_command_ally(player, self.ally):
             self.ally = None
             return True
+        else:
+            allies = (self.ally,)
         if button != p.SDL_BUTTON_LEFT:
             self.ally = None
+            self.group_command = False
             return True
         for action, _, left, bottom, right, top, enabled in self.ally_buttons():
             if not (left <= x < right and bottom <= y < top):
@@ -192,26 +204,33 @@ class PlayerUI:
             elif action == "back":
                 self.gather_menu = False
             elif action == "start":
-                self.ally.set_command(world, self.gather_resource, self.gather_amount)
+                for ally in allies:
+                    ally.set_command(world, self.gather_resource, self.gather_amount)
                 self.ally = None
+                self.group_command = False
             elif action == "take":
                 self.ally.human.take_gathered(player)
             else:
-                self.ally.set_command(world, action)
+                for ally in allies:
+                    ally.set_command(world, action)
                 self.ally = None
+                self.group_command = False
             return True
         if not (ALLY_LEFT <= x < ALLY_LEFT + 320 and ALLY_TOP - 224 < y <= ALLY_TOP):
             self.ally = None
+            self.group_command = False
         return True
 
-    def draw_ally(self, images):
-        if self.ally is None:
+    def draw_ally(self, images, group_count=0):
+        if self.ally is None and not self.group_command:
             return
         self.panel(images, "panel", ALLY_LEFT, ALLY_TOP, 320, 224)
-        self.text(ALLY_LEFT + 27, ALLY_TOP - 25, "채집 설정" if self.gather_menu else "조력자 명령")
-        human = self.ally.human
+        title = f"주변 조력자 명령  ·  {group_count}명" if self.group_command else "조력자 명령"
+        self.text(ALLY_LEFT + 27, ALLY_TOP - 25, "채집 설정" if self.gather_menu else title)
+        human = self.ally.human if self.ally is not None else None
         for action, label, left, bottom, right, top, enabled in self.ally_buttons():
-            selected = (action == self.gather_resource if self.gather_menu else action == human.command)
+            selected = (action == self.gather_resource if self.gather_menu
+                        else human is not None and action == human.command)
             color = (112, 89, 50) if selected else (64, 66, 65)
             if not enabled:
                 color = (43, 45, 46)
@@ -220,7 +239,7 @@ class PlayerUI:
                       (248, 239, 218) if enabled else (155, 153, 149))
         if self.gather_menu:
             self.text(366, 308, f"수량  {self.gather_amount}")
-        else:
+        elif human is not None:
             if human.supporting_attack:
                 status = "공동 공격 중"
             elif human.command in ("wood", "stone"):
@@ -230,10 +249,12 @@ class PlayerUI:
                 status = f"채집 {human.gather_shortfall}개 미달  ·  {suffix}"
             else:
                 status = {"return": "명령 지점으로 복귀 중", "follow": "따라가기 · 전투 지원",
-                          "attack": "공동 공격 중", "wait": "대기 중"}[human.command]
-            self.text(264, 275, status)
+                          "attack": "공동 공격 중", "wait": "대기 중", "spread": "멀어지는 중"}[human.command]
+            self.text(264, 252, status)
             counts = "  ".join(f"{ITEM_NAMES[item]} {count}" for item, count in human.inventory.items.items())
-            self.text(264, 250, f"보관 물품  {counts or '없음'}")
+            self.text(264, 231, f"보관 물품  {counts or '없음'}")
+        else:
+            self.text(264, 248, "반경 260px 안의 조력자에게 적용")
 
     def hotbar_slot_at(self, x, y):
         dx, dy = x - HOTBAR_X - 9, HOTBAR_TOP - y - 8
@@ -283,5 +304,7 @@ class PlayerUI:
             ("follow", "따라가기", 408, 333, 538, 361, True),
             ("attack", "공동 공격", 262, 296, 392, 324, True),
             ("gather", "채집", 408, 296, 538, 324, True),
-            ("take", "물품 받기", 262, 202, 538, 230, self.ally.human.can_take_gathered()),
+            ("spread", "멀어지기", 262, 259, 538, 287, True),
+            *((("take", "물품 받기", 262, 193, 538, 220, self.ally.human.can_take_gathered()),)
+              if self.ally is not None else ()),
         )

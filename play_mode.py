@@ -51,7 +51,10 @@ class PlayMode:
     def handle_events(self, events):
         for event in events:
             if event.type == p.SDL_KEYDOWN and event.key == p.SDLK_ESCAPE:
-                if self.ui.page is None:
+                if self.ui.group_command or self.ui.ally is not None:
+                    self.ui.group_command = False
+                    self.ui.ally = None
+                elif self.ui.page is None:
                     return True
                 self.ui.page = None
                 self.ui.dragged_item = None
@@ -67,9 +70,14 @@ class PlayMode:
                     self.player.inventory.select(event.key - p.SDLK_1)
                 elif event.key == p.SDLK_i:
                     self.ui.ally = None
+                    self.ui.group_command = False
                     self.ui.dragged_item = None
                     self.ui.page = "inventory" if self.ui.page is None else None
-                elif (self.ui.page is None and self.ui.ally is None
+                elif event.key == p.SDLK_r and self.ui.page is None:
+                    self.ui.ally = None
+                    self.ui.group_command = not self.ui.group_command
+                    self.ui.gather_menu = False
+                elif (self.ui.page is None and self.ui.ally is None and not self.ui.group_command
                       and event.key in (p.SDLK_e, p.SDLK_b, p.SDLK_q)):
                     cam_x, cam_y = self.camera
                     target = ((self.player.x, self.player.y) if self.mouse is None
@@ -102,9 +110,9 @@ class PlayMode:
                         self.ui.ally = ally
                         self.ui.gather_menu = False
                         continue
-                    item = self.world.collect_pickup(self.player.x, self.player.y, *target)
-                    if item is not None:
-                        self.player.inventory.add(item)
+                    self.world.collect_pickup(
+                        self.player.x, self.player.y, *target, inventory=self.player.inventory,
+                    )
         return False
 
     def update(self, dt):
@@ -148,13 +156,14 @@ class PlayMode:
         self.draw_buildings(interiors=False)
         remaining = sum(z.state == "zombie" for z in self.world.zombies)
         self.ui.draw_hud(self.images, self.player, remaining)
-        self.ui.draw_ally(self.images)
+        group_count = len(self.world.nearby_allies(self.player)) if self.ui.group_command else 0
+        self.ui.draw_ally(self.images, group_count)
         self.ui.draw_window(self.images, self.player)
         self.ui.draw_drag(self.images, self.player, self.mouse)
 
     def draw_buildings(self, interiors):
         cam_x, cam_y = self.camera
-        current_building = self.world.building_at(self.player.x, self.player.y)
+        current_building = self.world.revealed_building(self.player.x, self.player.y)
         for index, (kind, x, y, width, height, footprint) in enumerate(self.world.buildings):
             indoors = index == current_building
             if indoors != interiors:
@@ -286,7 +295,7 @@ class PlayMode:
 
     def draw_world_objects(self):
         player = self.player
-        current_building = self.world.building_at(player.x, player.y)
+        current_building = self.world.revealed_building(player.x, player.y)
         draw_order = []
         for zombie in self.world.zombies:
             if zombie.state == "escaped":
