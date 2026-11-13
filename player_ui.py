@@ -214,19 +214,17 @@ class PlayerUI:
             elif action == "back":
                 self.gather_menu = False
             elif action == "start":
-                if allies:
-                    world.sound("ally_order")
                 for ally in allies:
                     ally.set_command(world, self.gather_resource, self.gather_amount)
+                world.sound("ally_order", count=len(allies))
                 self.ally = None
                 self.group_command = False
             elif action == "take":
                 self.ally.human.take_gathered(player)
             else:
-                if allies:
-                    world.sound("ally_order")
                 for ally in allies:
                     ally.set_command(world, action)
+                world.sound("ally_order", count=len(allies))
                 self.ally = None
                 self.group_command = False
             return True

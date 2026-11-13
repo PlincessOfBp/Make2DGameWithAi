@@ -75,7 +75,7 @@ class World:
             min(max(round(y) - SCREEN_HEIGHT // 2, 0), MAP_HEIGHT - SCREEN_HEIGHT),
         )
 
-    def sound(self, event, x=None, y=None):
+    def sound(self, event, x=None, y=None, *, count=1):
         if self.audio is None:
             return
         if x is not None and self.player is not None:
@@ -83,7 +83,7 @@ class World:
                 return
             if event != "tree" and not self.pickup_path_clear(self.player.x, self.player.y, x, y):
                 return
-        self.audio.play(event)
+        self.audio.play(event, count)
 
 
     def move(self, x, y, dx, dy, radius, actor=None):

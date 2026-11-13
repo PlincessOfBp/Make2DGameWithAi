@@ -4,6 +4,8 @@ from time import monotonic
 
 import pico2d as p
 
+from town import ZOMBIE_POINTS
+
 
 EFFECTS = {
     "bite": (112, ("biting",)),
@@ -31,6 +33,7 @@ MUSIC = {
 LOG = getLogger(__name__)
 WALK_CHANNEL = 0
 BITE_CHANNEL = 1
+ALLY_ORDER_CHANNEL = 2
 
 
 class GameAudio:
@@ -51,7 +54,11 @@ class GameAudio:
             self.effects[event] = clips
         for name in MUSIC:
             self.tracks[name] = self.load(p.load_music, root / "bgm" / f"{name}.wav")
-        if self.effects["bite"]:
+        if self.effects["ally_order"]:
+            reserved = ALLY_ORDER_CHANNEL + len(ZOMBIE_POINTS)
+            p.Mix_AllocateChannels(reserved + 8)
+            p.Mix_ReserveChannels(reserved)
+        elif self.effects["bite"]:
             # A successful bite must be audible even when all shared channels are busy.
             p.Mix_ReserveChannels(BITE_CHANNEL + 1)
         elif self.effects["step"]:
@@ -77,9 +84,17 @@ class GameAudio:
             track.set_volume(MUSIC[name])
             track.repeat_play()
 
-    def play(self, event):
+    def play(self, event, count=1):
         clips = self.effects[event]
-        if not clips:
+        if not clips or count <= 0:
+            return
+        if event == "ally_order":
+            # Identical clips add together when played in sync, so share the gain.
+            volume = max(1, 128 // count)
+            for offset in range(count):
+                channel = ALLY_ORDER_CHANNEL + offset
+                p.Mix_Volume(channel, volume)
+                p.Mix_PlayChannel(channel, clips[0].wav, 0)
             return
         if event == "bite":
             p.Mix_PlayChannel(BITE_CHANNEL, clips[0].wav, 0)
