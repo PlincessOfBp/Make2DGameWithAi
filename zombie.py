@@ -9,7 +9,8 @@ CHASE_RADIUS = 8
 ROUTE_RETRY = 0.4
 ATTACK_FRAME_TIME = 0.12
 ATTACK_REACH = 31
-NPC_ATTACK_DAMAGE = 5
+ZOMBIE_ATTACK_DAMAGE = 10
+ALLY_ATTACK_DAMAGE = 5
 NPC_ATTACK_INTERVAL = 2
 
 
@@ -196,11 +197,11 @@ class Zombie:
                     and world.pickup_path_clear(self.x, self.y, target.x, target.y)):
                 self.next_hit = now + NPC_ATTACK_INTERVAL
                 if target is player:
-                    player.take_damage(NPC_ATTACK_DAMAGE, now)
+                    player.take_damage(ZOMBIE_ATTACK_DAMAGE, now)
                 elif target.state == "zombie":
-                    world.hit_zombie(target, NPC_ATTACK_DAMAGE)
+                    world.hit_zombie(target, ALLY_ATTACK_DAMAGE)
                 else:
-                    target.health = max(0, target.health - NPC_ATTACK_DAMAGE)
+                    target.health = max(0, target.health - ZOMBIE_ATTACK_DAMAGE)
                     if target.health == 0:
                         target.state = "dead"
                     else:

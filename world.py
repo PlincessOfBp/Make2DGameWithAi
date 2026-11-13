@@ -240,7 +240,7 @@ class World:
             self.hit_tree(position, weapon)
         elif action == "bite":
             zombie.purify_at = self.resource_time + 10
-            player.infection = min(100, player.infection + 10)
+            player.infection = min(100, player.infection + 20)
         else:
             self.attack_target = zombie
             self.attack_target_at = self.resource_time
