@@ -13,7 +13,7 @@ EFFECTS = {
     "zombie_voice": (43, ("zombie1", "zombie2")),
     "step": (35, ("walking",)),
     "swing": (53, ("swish",)),
-    "hit": (66, ("hard-slap",)),
+    "hit": (36, ("hard-slap",)),
     "tree": (67, ("hit-tree",)),
     "craft": (64, ("make",)),
     "eat": (65, ("eat",)),
