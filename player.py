@@ -85,6 +85,8 @@ class Player:
         self.hurt_until = now + 0.16 if self.health else 0.0
 
     def drop_selected(self, world):
+        if self.action == "attack" and self.inventory.selected_item() == self.action_weapon:
+            return False
         item = self.inventory.selected_item()
         if item is None or not world.drop_item(self, item):
             return False

@@ -1,19 +1,27 @@
-from item_data import HOTBAR_ITEMS, RECIPES
+from item_data import HOTBAR_ITEMS, RECIPES, TOOL_DURABILITY
 
 
 class Inventory:
     def __init__(self):
         self.items = {}
+        self.durability = {}
         self.slots = [None] * 5
         self.selected = 0
 
-    def add(self, item, count=1):
+    def add(self, item, count=1, *, durability=None):
         previous = self.items.get(item, 0)
         self.items[item] = previous + count
+        if item in TOOL_DURABILITY:
+            uses = TOOL_DURABILITY[item] if durability is None else durability
+            self.durability.setdefault(item, []).extend([uses] * count)
         if not previous and item in HOTBAR_ITEMS and None in self.slots:
             self.slots[self.slots.index(None)] = item
 
     def remove(self, item, count=1):
+        if item in self.durability:
+            del self.durability[item][:count]
+            if not self.durability[item]:
+                del self.durability[item]
         remaining = self.items[item] - count
         if remaining:
             self.items[item] = remaining
@@ -58,3 +66,9 @@ class Inventory:
 
     def select(self, slot):
         self.selected = None if self.selected == slot else slot
+
+    def wear_tool(self, item):
+        if item in self.durability:
+            self.durability[item][0] -= 1
+            if self.durability[item][0] == 0:
+                self.remove(item)
