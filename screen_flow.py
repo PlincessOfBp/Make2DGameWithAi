@@ -6,6 +6,7 @@ from pico2d import pico2d as renderer_backend
 from play_mode import ASSETS, PlayMode
 from player_ui import PlayerUI
 from town import SCREEN_HEIGHT, SCREEN_WIDTH
+from game_audio import GameAudio
 
 
 RESULT_IMAGES = {
@@ -14,6 +15,13 @@ RESULT_IMAGES = {
     "새드 엔딩": "ending_sad",
     "해피 엔딩": "ending_happy",
 }
+RESULT_MUSIC = {
+    "게임 오버 · 사망": "ending_loss",
+    "게임 오버 · 좀비화": "ending_infection",
+    "새드 엔딩": "ending_loss",
+    "해피 엔딩": "ending_happy",
+}
+LOADING_FINISH_SECONDS = 5.0
 BUTTONS = {
     "main": (("start", "", 194, 54), ("help", "", 400, 54), ("quit", "종료", 606, 54)),
     "help": (("back", "", 400, 64),),
@@ -51,6 +59,8 @@ class ScreenFlow:
         self.pointer = None
         self.pressed = None
         self.error = ""
+        self.audio = GameAudio(ASSETS / "sound")
+        self.audio.music("title")
         for path in sorted((ASSETS / "screens").glob("*.png")):
             try:
                 self.images[path.stem] = p.load_image(str(path))
@@ -59,6 +69,7 @@ class ScreenFlow:
 
     def exit(self):
         self.close_play()
+        self.audio.close()
         self.images.clear()
         self.ui.font = None
 
@@ -72,15 +83,29 @@ class ScreenFlow:
             self.play = None
 
     def change_screen(self, state):
+        previous = self.state
         self.state = state
         self.pressed = None
+        if state != "play":
+            self.audio.walk(False)
+        if state in ("main", "help"):
+            self.audio.music("title")
+        elif state in ("play", "pause"):
+            self.audio.music("gameplay")
+        elif state == "ending":
+            self.audio.music(RESULT_MUSIC[self.result])
+        elif state == "error" or (state == "loading" and previous == "ending"):
+            self.audio.music(None)
 
     def start_loading(self):
         self.close_play()
         self.play = PlayMode()
+        self.play.audio = self.audio
         self.loader = self.play.load_steps()
         self.loaded = self.total = 0
         self.loading_time = 0.0
+        self.loading_finish_time = 0.0
+        self.loading_progress = 0.0
         self.change_screen("loading")
 
     def update(self, dt):
@@ -105,9 +130,13 @@ class ScreenFlow:
                         self.loader = None
                     else:
                         self.loaded, self.total = step
-                elif self.loading_time >= 0.5:
+                        self.loading_progress = 0.9 * self.loaded / self.total
+                elif self.loading_finish_time >= LOADING_FINISH_SECONDS:
                     self.change_screen("play")
                     self.play.mouse = self.pointer
+                else:
+                    self.loading_finish_time = min(LOADING_FINISH_SECONDS, self.loading_finish_time + dt)
+                    self.loading_progress = 0.9 + 0.1 * (self.loading_finish_time / LOADING_FINISH_SECONDS)
             except OSError as error:
                 self.error = str(error)
                 self.close_play()
@@ -148,6 +177,7 @@ class ScreenFlow:
                 action = self.button_at()
                 pressed, self.pressed = self.pressed, None
                 if action is not None and action == pressed:
+                    self.audio.play("click")
                     if action == "quit":
                         return True
                     if action in ("start", "restart"):
@@ -211,7 +241,7 @@ class ScreenFlow:
             if mouth is not None:
                 mouth.clip_draw(int(self.loading_time / 0.12) % 4 * 192, 0, 192, 128, 400, 320)
             self.draw_image("loading_track", 400, 76)
-            width = 392 * self.loaded // self.total if self.total else 0
+            width = int(392 * self.loading_progress)
             fill = self.images.get("loading_fill")
             if fill is not None and width:
                 fill.clip_draw(0, 0, width, 16, 204 + width / 2, 76)

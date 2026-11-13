@@ -82,6 +82,7 @@ class Zombie:
             self.next_hit = world.resource_time
             self.hurt_until = 0.0
             self.human.set_command(world, "wait")
+            world.sound("ally_hello" if self.state == "ally" else "runaway", self.x, self.y)
         if self.human is not None:
             self.human.update(world, player, dt)
         else:
@@ -134,6 +135,8 @@ class Zombie:
             return
         target = self.see_target(world, player)
         if target is not None:
+            if self.last_seen is None:
+                world.sound("zombie_voice", self.x, self.y)
             self.wander_goal = None
             self.wander_at = world.resource_time + 3
             self.last_seen = (target.x, target.y)
@@ -197,13 +200,18 @@ class Zombie:
                     and world.pickup_path_clear(self.x, self.y, target.x, target.y)):
                 self.next_hit = now + NPC_ATTACK_INTERVAL
                 if target is player:
+                    world.sound("zombie_bite")
                     player.take_damage(ZOMBIE_ATTACK_DAMAGE, now)
                 elif target.state == "zombie":
                     world.hit_zombie(target, ALLY_ATTACK_DAMAGE)
                 else:
+                    world.sound("zombie_bite", target.x, target.y)
                     target.health = max(0, target.health - ZOMBIE_ATTACK_DAMAGE)
                     if target.health == 0:
+                        was_ally = target.state == "ally"
                         target.state = "dead"
+                        if was_ally:
+                            world.sound("ally_death", target.x, target.y)
                     else:
                         target.hurt_until = now + 0.16
         return now < self.attack_until

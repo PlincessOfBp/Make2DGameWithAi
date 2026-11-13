@@ -16,6 +16,8 @@ ASSETS = Path(__file__).resolve().parent / "assets"
 
 
 class PlayMode:
+    audio = None
+
     def enter(self):
         for _ in self.load_steps():
             pass
@@ -23,7 +25,9 @@ class PlayMode:
     def load_steps(self):
         self.player = Player()
         self.world = World(self.player)
+        self.world.audio = self.audio
         self.ui = PlayerUI()
+        self.ui.audio = self.audio
         self.ui.load_font()
         self.keys = set()
         self.mouse = None
@@ -58,10 +62,14 @@ class PlayMode:
         for event in events:
             if event.type == p.SDL_KEYDOWN and event.key == p.SDLK_ESCAPE:
                 if self.ui.group_command or self.ui.ally is not None:
+                    self.world.sound("click")
                     self.ui.group_command = False
                     self.ui.ally = None
                 elif self.ui.page is None:
+                    self.world.sound("click")
                     return True
+                else:
+                    self.world.sound("click")
                 self.ui.page = None
                 self.ui.dragged_item = None
             elif event.type == p.SDL_KEYUP:
@@ -74,12 +82,15 @@ class PlayMode:
                 self.keys.add(event.key)
                 if p.SDLK_1 <= event.key <= p.SDLK_5:
                     self.player.inventory.select(event.key - p.SDLK_1)
+                    self.world.sound("click")
                 elif event.key == p.SDLK_i:
+                    self.world.sound("click")
                     self.ui.ally = None
                     self.ui.group_command = False
                     self.ui.dragged_item = None
                     self.ui.page = "inventory" if self.ui.page is None else None
                 elif event.key == p.SDLK_r and self.ui.page is None:
+                    self.world.sound("click")
                     self.ui.ally = None
                     self.ui.group_command = not self.ui.group_command
                     self.ui.gather_menu = False
@@ -109,25 +120,33 @@ class PlayMode:
                 cam_x, cam_y = self.camera
                 target = (x + cam_x, y + cam_y)
                 if event.button == p.SDL_BUTTON_LEFT:
-                    self.player.start_action("attack", *target)
+                    if self.player.start_action("attack", *target):
+                        self.world.sound("swing")
                 elif event.button == p.SDL_BUTTON_RIGHT:
                     ally = self.world.ally_at(self.player, *target)
                     if ally is not None:
+                        self.world.sound("ally_hello")
                         self.ui.ally = ally
                         self.ui.gather_menu = False
                         continue
-                    self.world.collect_pickup(
+                    item = self.world.collect_pickup(
                         self.player.x, self.player.y, *target, inventory=self.player.inventory,
                     )
+                    if item is not None:
+                        self.world.sound("click")
         return False
 
     def update(self, dt):
         if self.ui.page is not None or self.ui.result is not None:
+            if self.audio is not None:
+                self.audio.walk(False)
             return
         horizontal = (p.SDLK_d in self.keys) - (p.SDLK_a in self.keys)
         vertical = (p.SDLK_w in self.keys) - (p.SDLK_s in self.keys)
         self.player.move(self.world, horizontal, vertical, dt)
         self.world.update_resources(dt, self.player.x, self.player.y)
+        if self.audio is not None:
+            self.audio.walk(bool(self.player.walk_time))
         self.camera = self.world.camera(self.player.x, self.player.y)
         if self.mouse is not None:
             mouse_x, mouse_y = self.mouse

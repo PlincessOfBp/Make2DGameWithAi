@@ -17,6 +17,7 @@ from town import (
 
 class World:
     def __init__(self, player=None):
+        self.audio = None
         self.player = player
         self.buildings = []
         self.trees = dict.fromkeys(TREE_TRUNKS, TREE_MAX_HP)
@@ -73,6 +74,16 @@ class World:
             min(max(round(x) - SCREEN_WIDTH // 2, 0), MAP_WIDTH - SCREEN_WIDTH),
             min(max(round(y) - SCREEN_HEIGHT // 2, 0), MAP_HEIGHT - SCREEN_HEIGHT),
         )
+
+    def sound(self, event, x=None, y=None):
+        if self.audio is None:
+            return
+        if x is not None and self.player is not None:
+            if hypot(x - self.player.x, y - self.player.y) > 300:
+                return
+            if event != "tree" and not self.pickup_path_clear(self.player.x, self.player.y, x, y):
+                return
+        self.audio.play(event)
 
 
     def move(self, x, y, dx, dy, radius, actor=None):
@@ -239,6 +250,7 @@ class World:
         if zombie is None:
             self.hit_tree(position, weapon)
         elif action == "bite":
+            self.sound("bite")
             zombie.purify_at = self.resource_time + 10
             player.infection = min(100, player.infection + 20)
         else:
@@ -251,6 +263,7 @@ class World:
     def hit_zombie(self, zombie, damage):
         if zombie.state != "zombie":
             return
+        self.sound("hit", zombie.x, zombie.y)
         zombie.health = max(0, zombie.health - damage)
         if zombie.health:
             zombie.hurt_until = self.resource_time + 0.16
@@ -295,6 +308,7 @@ class World:
         damage = TREE_DAMAGE.get(weapon)
         if damage is None or position not in self.trees:
             return False
+        self.sound("tree", *position)
         remaining = self.trees[position] - damage
         if remaining > 0:
             self.trees[position] = remaining

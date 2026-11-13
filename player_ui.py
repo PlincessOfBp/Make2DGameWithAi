@@ -18,6 +18,8 @@ UI_ASSETS = (
 
 
 class PlayerUI:
+    audio = None
+
     def __init__(self):
         self.page = None
         self.recipe = next(iter(RECIPES))
@@ -54,6 +56,8 @@ class PlayerUI:
                         self.dragged_item = inventory.slots[slot]
                     else:
                         inventory.select(slot)
+                        if self.audio is not None:
+                            self.audio.play("click")
             return True
         if self.page is None:
             return False
@@ -62,9 +66,13 @@ class PlayerUI:
         if 450 <= y <= 477:
             if 250 <= x < 395:
                 self.page = "inventory"
+                if self.audio is not None:
+                    self.audio.play("click")
             elif 405 <= x < 550:
                 self.dragged_item = None
                 self.page = "craft"
+                if self.audio is not None:
+                    self.audio.play("click")
         elif self.page == "inventory":
             dx, dy = x - INVENTORY_X - 16, INVENTORY_TOP - y - 49
             if 0 <= dx < 6 * 54 and 0 <= dy < 3 * 54 and dx % 54 < 48 and dy % 54 < 48:
@@ -77,7 +85,8 @@ class PlayerUI:
             if 20 <= dx < 154 and 56 <= dy < 56 + 3 * 63 and (dy - 56) % 63 < 56:
                 self.recipe = tuple(RECIPES)[(dy - 56) // 63]
             elif 293 <= dx <= 414 and 222 <= dy <= 251:
-                inventory.craft(self.recipe)
+                if inventory.craft(self.recipe) and self.audio is not None:
+                    self.audio.play("craft")
         return True
 
     def text(self, x, y, value, color=(248, 239, 218)):
@@ -192,6 +201,7 @@ class PlayerUI:
                 continue
             if not enabled:
                 return True
+            world.sound("click")
             if action == "gather":
                 self.gather_menu = True
                 self.gather_resource, self.gather_amount = "wood", 1
@@ -204,6 +214,8 @@ class PlayerUI:
             elif action == "back":
                 self.gather_menu = False
             elif action == "start":
+                if allies:
+                    world.sound("ally_order")
                 for ally in allies:
                     ally.set_command(world, self.gather_resource, self.gather_amount)
                 self.ally = None
@@ -211,6 +223,8 @@ class PlayerUI:
             elif action == "take":
                 self.ally.human.take_gathered(player)
             else:
+                if allies:
+                    world.sound("ally_order")
                 for ally in allies:
                     ally.set_command(world, action)
                 self.ally = None

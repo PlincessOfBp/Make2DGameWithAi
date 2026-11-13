@@ -79,11 +79,13 @@ class Player:
         if item == "canned_food" and (self.health < 100 or self.infection > 0):
             self.health = min(100, self.health + 30)
             self.infection = max(0, self.infection - 20)
+            world.sound("eat")
         elif item == "barricade":
             x = round(self.x - sin(self.target_angle) * 64)
             y = round(self.y + cos(self.target_angle) * 64)
             if not world.place_barricade(self, x, y):
                 return False
+            world.sound("craft")
         else:
             return False
         self.inventory.remove(item)
