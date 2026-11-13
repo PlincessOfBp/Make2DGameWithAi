@@ -171,6 +171,11 @@ class HumanNPC:
     def choose_resource(self, world):
         actor = self.actor
         start = (actor.x, actor.y)
+        reserved = {
+            npc.human.target for npc in world.zombies
+            if npc is not actor and npc.state == "ally" and npc.health > 0
+            and npc.human is not None and npc.human.command == self.command
+        }
         if self.command == "wood":
             self.tool = WOOD_GATHER_TOOL
             points = [(position, *position) for position in world.trees]
@@ -178,7 +183,7 @@ class HumanNPC:
             points = [(pickup_id, x, y) for pickup_id, item, x, y in world.visible_pickups(*start)
                       if item == "stone"]
         for target, x, y in sorted(points, key=lambda entry: hypot(entry[1] - actor.x, entry[2] - actor.y)):
-            if target in self.skipped_resources:
+            if target in reserved or target in self.skipped_resources:
                 continue
             angle = atan2(actor.y - y, actor.x - x)
             goals = [(x, y)] if self.command == "stone" else [
