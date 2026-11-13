@@ -179,12 +179,34 @@ class PlayMode:
         self.draw_buildings(interiors=True)
         self.draw_world_objects()
         self.draw_buildings(interiors=False)
+        self.draw_barricade_preview()
         remaining = sum(z.state == "zombie" for z in self.world.zombies)
         self.ui.draw_hud(self.images, self.player, remaining)
         group_count = len(self.world.nearby_allies(self.player)) if self.ui.group_command else 0
         self.ui.draw_ally(self.images, group_count)
         self.ui.draw_window(self.images, self.player)
         self.ui.draw_drag(self.images, self.player, self.mouse)
+
+    def draw_barricade_preview(self):
+        if (self.player.inventory.selected_item() != "barricade"
+                or self.ui.page is not None or self.ui.ally is not None
+                or self.ui.group_command or self.ui.result is not None):
+            return
+        x, y = self.player.barricade_position()
+        blocker = self.world.barricade_blocker(self.player, x, y)
+        cam_x, cam_y = self.camera
+        x, y = x - cam_x, y - cam_y
+        image = self.images["world/props/barricade.png"]
+        if image is not None:
+            image.opacify(0.45)
+            try:
+                image.draw(x, y + 10)
+            finally:
+                image.opacify(1.0)
+        color = (248, 115, 104) if blocker else (140, 235, 155)
+        p.draw_rectangle(x - 29, y - 14, x + 29, y + 14, *color)
+        p.draw_rectangle(258, 76, 542, 105, 27, 30, 28, filled=True)
+        self.ui.text(273, 90, blocker or "E  바리케이트 설치", color)
 
     def draw_buildings(self, interiors):
         cam_x, cam_y = self.camera
