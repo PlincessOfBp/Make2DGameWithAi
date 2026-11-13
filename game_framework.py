@@ -10,7 +10,10 @@ class GameFramework:
     def run(self, mode):
         p.SDL_SetHint(b"SDL_RENDER_SCALE_QUALITY", b"0")
         p.open_canvas(SCREEN_WIDTH, SCREEN_HEIGHT, sync=True)
+        print_fps = backend.print_fps
         try:
+            p.SDL_SetWindowTitle(backend.window, "이제 누가 좀비지?".encode("utf-8"))
+            backend.print_fps = lambda: None
             p.SDL_SetWindowResizable(backend.window, p.SDL_TRUE)
             p.SDL_SetWindowMinimumSize(backend.window, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
             # SDL scales the viewport and converts mouse events to the same logical coordinates.
@@ -39,6 +42,7 @@ class GameFramework:
                 mode.draw()
                 p.update_canvas()
         finally:
+            backend.print_fps = print_fps
             try:
                 mode.exit()
             finally:

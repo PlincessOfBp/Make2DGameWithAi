@@ -23,12 +23,17 @@ RESULT_MUSIC = {
 }
 LOADING_FINISH_SECONDS = 5.0
 BUTTONS = {
-    "main": (("start", "", 194, 54), ("help", "", 400, 54), ("quit", "종료", 606, 54)),
+    "main": (("start", "", 109, 54), ("help", "", 303, 54),
+             ("settings", "", 497, 54), ("quit", "종료", 691, 54)),
     "help": (("back", "", 400, 64),),
+    "settings": (("back", "", 400, 173),),
     "ending": (("restart", "다시 시작", 294, 46), ("menu", "메인으로", 506, 46)),
-    "pause": (("confirm", "확인", 294, 239), ("cancel", "취소", 506, 239)),
+    "pause": (("confirm", "확인", 294, 227), ("cancel", "취소", 506, 227),
+              ("settings", "", 400, 282)),
     "error": (("menu", "메인으로", 400, 64),),
 }
+VOLUME_SLIDERS = (("bgm", "BGM", 360), ("effects", "효과음", 270))
+SLIDER_LEFT, SLIDER_RIGHT = 249, 551
 HELP_GOALS = (
     "마을에 남은 좀비를 모두 정리하세요.",
     "물린 좀비는 10초 뒤 정화됩니다.",
@@ -86,6 +91,7 @@ class ScreenFlow:
         previous = self.state
         self.state = state
         self.pressed = None
+        self.dragging_volume = None
         if state != "play":
             self.audio.walk(False)
         if state in ("main", "help"):
@@ -171,6 +177,27 @@ class ScreenFlow:
                     self.close_play()
                     self.change_screen("main")
                 break
+            if self.state == "settings":
+                if event.type == p.SDL_MOUSEBUTTONDOWN and event.button == p.SDL_BUTTON_LEFT:
+                    x, y = self.pointer
+                    self.dragging_volume = next(
+                        (category for category, _, cy in VOLUME_SLIDERS
+                         if SLIDER_LEFT - 10 <= x <= SLIDER_RIGHT + 10 and abs(y - cy) <= 16),
+                        None,
+                    )
+                    if self.dragging_volume is not None:
+                        self.pressed = None
+                if self.dragging_volume is not None and (
+                    event.type in (p.SDL_MOUSEMOTION, p.SDL_MOUSEBUTTONDOWN, p.SDL_MOUSEBUTTONUP)
+                    and (event.type == p.SDL_MOUSEMOTION or event.button == p.SDL_BUTTON_LEFT)
+                ):
+                    percent = round((self.pointer[0] - SLIDER_LEFT) * 100 / (SLIDER_RIGHT - SLIDER_LEFT))
+                    self.audio.set_volume(self.dragging_volume, percent)
+                    if event.type == p.SDL_MOUSEBUTTONUP:
+                        if self.dragging_volume == "effects":
+                            self.audio.play("click")
+                        self.dragging_volume = None
+                    continue
             if event.type == p.SDL_MOUSEBUTTONDOWN and event.button == p.SDL_BUTTON_LEFT:
                 self.pressed = self.button_at()
             elif event.type == p.SDL_MOUSEBUTTONUP and event.button == p.SDL_BUTTON_LEFT:
@@ -184,6 +211,11 @@ class ScreenFlow:
                         self.start_loading()
                     elif action == "help":
                         self.change_screen("help")
+                    elif action == "settings":
+                        self.settings_origin = self.state
+                        self.change_screen("settings")
+                    elif action == "back" and self.state == "settings":
+                        self.change_screen(self.settings_origin)
                     elif action == "cancel":
                         self.resume()
                     else:
@@ -226,7 +258,24 @@ class ScreenFlow:
             self.dim()
             self.play.ui.panel(self.play.images, "panel", 240, 412, 320, 224)
             self.center_text(400, 356, "일시정지")
-            self.center_text(400, 313, "메인 화면으로 돌아가시겠습니까?")
+            self.center_text(400, 328, "메인 화면으로 돌아가시겠습니까?")
+        elif self.state == "settings":
+            if self.settings_origin == "pause":
+                self.play.draw()
+            else:
+                self.draw_image("main")
+            self.dim()
+            p.draw_rectangle(210, 135, 590, 465, 36, 31, 31, filled=True)
+            p.draw_rectangle(210, 135, 590, 465, 143, 104, 68)
+            self.center_text(400, 426, "음량 설정")
+            for category, label, y in VOLUME_SLIDERS:
+                percent = self.audio.bgm_volume if category == "bgm" else self.audio.effects_volume
+                position = SLIDER_LEFT + round((SLIDER_RIGHT - SLIDER_LEFT) * percent / 100)
+                self.ui.text(SLIDER_LEFT, y + 27, label)
+                self.center_text(SLIDER_RIGHT - 20, y + 27, f"{percent}%")
+                p.draw_rectangle(SLIDER_LEFT, y - 4, SLIDER_RIGHT, y + 4, 74, 61, 57, filled=True)
+                p.draw_rectangle(SLIDER_LEFT, y - 4, position, y + 4, 196, 149, 83, filled=True)
+                p.draw_rectangle(position - 5, y - 10, position + 5, y + 10, 241, 219, 171, filled=True)
         elif self.state in ("main", "help"):
             self.draw_image("main")
             if self.state == "help":
@@ -260,11 +309,12 @@ class ScreenFlow:
             style = "normal"
             if action == hovered:
                 style = "pressed" if action == self.pressed else "hover"
-            name = f"button_{action}_{style}" if action in ("start", "help", "back") else f"button_{style}"
+            name = f"button_{action}_{style}" if action in ("start", "help", "back", "settings") else f"button_{style}"
             if self.images.get(name) is not None:
                 self.draw_image(name, x, y)
             else:
                 p.draw_rectangle(x - 92, y - 23, x + 92, y + 23, 75, 57, 47, filled=True)
-                label = label or {"start": "게임 시작", "help": "게임 설명", "back": "돌아가기"}[action]
+                label = label or {"start": "게임 시작", "help": "게임 설명", "back": "돌아가기",
+                                  "settings": "설정"}[action]
             if label:
                 self.center_text(x, y, label)

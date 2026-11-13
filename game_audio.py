@@ -41,6 +41,8 @@ class GameAudio:
         self.effects = {}
         self.tracks = {}
         self.current = None
+        self.bgm_volume = 100
+        self.effects_volume = 100
         self.random = Random()
         self.next_voice_at = 0.0
         self.walking = False
@@ -81,8 +83,21 @@ class GameAudio:
         self.current = name
         track = self.tracks.get(name)
         if track is not None:
-            track.set_volume(MUSIC[name])
+            track.set_volume(round(MUSIC[name] * self.bgm_volume / 100))
             track.repeat_play()
+
+    def set_volume(self, category, percent):
+        percent = max(0, min(100, percent))
+        if category == "bgm":
+            self.bgm_volume = percent
+            track = self.tracks.get(self.current)
+            if track is not None:
+                track.set_volume(round(MUSIC[self.current] * percent / 100))
+        elif category == "effects":
+            self.effects_volume = percent
+            for event, clips in self.effects.items():
+                for clip in clips:
+                    clip.set_volume(round(EFFECTS[event][0] * percent / 100))
 
     def play(self, event, count=1):
         clips = self.effects[event]
