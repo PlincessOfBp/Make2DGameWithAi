@@ -38,6 +38,8 @@ class Zombie:
         self.route_goal = None
         self.next_route_at = 0.0
         self.avoid_side = -1 if entity_id % 2 else 1
+        self.wander_goal = None
+        self.wander_at = 2.0 + entity_id % 7
 
     def move_toward(self, world, x, y, dt, speed, stop, steer=True):
         dx, dy = x - self.x, y - self.y
@@ -131,6 +133,8 @@ class Zombie:
             return
         target = self.see_target(world, player)
         if target is not None:
+            self.wander_goal = None
+            self.wander_at = world.resource_time + 3
             self.last_seen = (target.x, target.y)
             self.seen_until = world.resource_time + SIGHT_MEMORY
             if hypot(target.x - self.x, target.y - self.y) <= ATTACK_REACH:
@@ -141,10 +145,36 @@ class Zombie:
               and hypot(self.last_seen[0] - self.x, self.last_seen[1] - self.y) > 3):
             self.follow_route(world, self.last_seen, dt, 0)
         else:
-            self.last_seen = None
-            self.route.clear()
-            self.route_goal = None
+            if self.last_seen is not None:
+                self.last_seen = None
+                self.route.clear()
+                self.route_goal = None
+            self.wander(world, dt)
+
+    def wander(self, world, dt):
+        now = world.resource_time
+        if self.wander_goal is None:
             self.walk_time = 0.0
+            if now < self.wander_at:
+                return
+            self.wander_at = now + world.random.uniform(3, 7)
+            start = (self.x, self.y)
+            room = world.building_at(*start)
+            for _ in range(8):
+                angle = world.random.uniform(0, 2 * pi)
+                distance = world.random.uniform(30, 85)
+                goal = world.move(*start, cos(angle) * distance, sin(angle) * distance, self.RADIUS)
+                if (hypot(goal[0] - self.x, goal[1] - self.y) >= 24
+                        and world.building_at(*goal) == room
+                        and world.pickup_path_clear(*start, *goal, self.RADIUS)):
+                    self.wander_goal = goal
+                    break
+        if self.wander_goal is not None:
+            self.move_toward(world, *self.wander_goal, dt, 48, 0, steer=False)
+            if dt > 0 and (not self.walk_time or hypot(
+                self.x - self.wander_goal[0], self.y - self.wander_goal[1]
+            ) < 0.01):
+                self.wander_goal = None
 
     def start_attack(self, target, now):
         self.walk_time = 0.0
