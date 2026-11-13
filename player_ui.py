@@ -1,4 +1,3 @@
-from math import ceil
 from os import environ
 from pathlib import Path
 
@@ -115,8 +114,7 @@ class PlayerUI:
             p.draw_rectangle(38, y - 8, 138, y + 8, 43, 44, 46, filled=True)
             if value > 0:
                 p.draw_rectangle(38, y - 8, 38 + value, y + 8, *color, filled=True)
-            displayed = min(99, ceil(value)) if name == "infection" and value < 100 else int(value)
-            self.text(145, y, str(displayed))
+            self.text(145, y, str(int(value)))
         self.text(662, 574, f"남은 좀비 {remaining}")
         self.panel(images, "quickbar", HOTBAR_X, HOTBAR_TOP, 282, 64)
         for index, item in enumerate(inventory.slots):

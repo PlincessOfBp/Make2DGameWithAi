@@ -4,6 +4,10 @@ from inventory import Inventory
 from item_data import WEAPON_COLUMNS
 
 
+INFECTION_DECAY_INTERVAL = 60
+INFECTION_DECAY_AMOUNT = 2
+
+
 class Player:
     SPEED = 220
     RADIUS = 8
@@ -18,7 +22,8 @@ class Player:
         self.items = self.inventory.items
         self.health = 100
         self.hurt_until = 0.0
-        self.infection = 0.0
+        self.infection = 0
+        self.infection_decay_elapsed = 0.0
         self.action = None
         self.action_elapsed = 0.0
         self.action_angle = 0.0
@@ -55,7 +60,11 @@ class Player:
         return True
 
     def update_action(self, world, dt):
-        self.infection = max(0.0, self.infection - dt * (2 / 60))
+        self.infection_decay_elapsed += dt
+        intervals = int((self.infection_decay_elapsed + 1e-9) / INFECTION_DECAY_INTERVAL)
+        if intervals:
+            self.infection_decay_elapsed -= intervals * INFECTION_DECAY_INTERVAL
+            self.infection = max(0, self.infection - intervals * INFECTION_DECAY_AMOUNT)
         if self.action is None:
             return
         previous = self.action_elapsed
