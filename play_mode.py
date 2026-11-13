@@ -17,6 +17,10 @@ ASSETS = Path(__file__).resolve().parent / "assets"
 
 class PlayMode:
     def enter(self):
+        for _ in self.load_steps():
+            pass
+
+    def load_steps(self):
         self.player = Player()
         self.world = World(self.player)
         self.ui = PlayerUI()
@@ -38,11 +42,13 @@ class PlayMode:
             paths.update(f"world/props/{name}.png" for name, _, _ in self.world.furniture[x, y])
             for layer in ("interior", "roof"):
                 paths.add(f"world/buildings/{kind}_{layer}.png")
-        for path in sorted(paths):
+        yield (1, len(paths) + 1)
+        for index, path in enumerate(sorted(paths), start=2):
             try:
                 self.images[path] = p.load_image(str(ASSETS / path))
             except OSError:
                 self.images[path] = None
+            yield (index, len(paths) + 1)
 
     def exit(self):
         self.images.clear()
