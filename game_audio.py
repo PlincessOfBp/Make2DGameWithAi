@@ -6,7 +6,7 @@ import pico2d as p
 
 
 EFFECTS = {
-    "bite": (72, ("biting",)),
+    "bite": (112, ("biting",)),
     "zombie_bite": (65, ("zombie-bite",)),
     "zombie_voice": (43, ("zombie1", "zombie2")),
     "step": (35, ("walking",)),
@@ -29,6 +29,8 @@ MUSIC = {
     "ending_happy": 48,
 }
 LOG = getLogger(__name__)
+WALK_CHANNEL = 0
+BITE_CHANNEL = 1
 
 
 class GameAudio:
@@ -49,7 +51,10 @@ class GameAudio:
             self.effects[event] = clips
         for name in MUSIC:
             self.tracks[name] = self.load(p.load_music, root / "bgm" / f"{name}.wav")
-        if self.effects["step"]:
+        if self.effects["bite"]:
+            # A successful bite must be audible even when all shared channels are busy.
+            p.Mix_ReserveChannels(BITE_CHANNEL + 1)
+        elif self.effects["step"]:
             p.Mix_ReserveChannels(1)
 
     @staticmethod
@@ -76,6 +81,9 @@ class GameAudio:
         clips = self.effects[event]
         if not clips:
             return
+        if event == "bite":
+            p.Mix_PlayChannel(BITE_CHANNEL, clips[0].wav, 0)
+            return
         if event == "zombie_voice":
             now = monotonic()
             if now < self.next_voice_at:
@@ -96,6 +104,6 @@ class GameAudio:
             return
         self.walking = moving
         if moving:
-            p.Mix_PlayChannel(0, clips[0].wav, -1)
+            p.Mix_PlayChannel(WALK_CHANNEL, clips[0].wav, -1)
         else:
-            p.Mix_HaltChannel(0)
+            p.Mix_HaltChannel(WALK_CHANNEL)
