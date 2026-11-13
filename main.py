@@ -1,6 +1,6 @@
 from game_framework import GameFramework
-from play_mode import PlayMode
+from screen_flow import ScreenFlow
 
 
 if __name__ == "__main__":
-    GameFramework().run(PlayMode())
+    GameFramework().run(ScreenFlow())
